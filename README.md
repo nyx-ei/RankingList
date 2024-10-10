@@ -53,8 +53,9 @@ After installation, you can configure the module by following these steps:
 4. 
 ## How to join the project
 
-To join the project, you will need: 
-@@ -32,6 +76,10 @@ In order for your contributions to be considered, please follow the instructions
+
+In order for your contributions to be considered, please follow the instructions
+
 ## Roadmap
 See the [open issues](https://github.com/nyx-ei/RankingList/issues) for a list of proposed features (and known issues)
 
@@ -64,3 +65,5 @@ This project is under proprietary license. You may not publish, distribute or re
 
 
 ## Contact
+
+For any queries or support, please reach out to us at help@nyx-ei.tech
