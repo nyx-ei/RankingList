@@ -60,7 +60,7 @@ See the [open issues](https://github.com/nyx-ei/RankingList/issues) for a list o
 
 ## License
 
-This project is under proprietary license. You may not publish, distribute or reproduce the code without our explicit consent. For more information, please see the [LICENSE](LICENSE) file in this repository.
+This project is under proprietary license. You may not publish, distribute or reproduce the code without our explicit consent. For more information, please see the [LICENSE](https://github.com/nyx-ei/RankingList/blob/main/License) file in this repository.
 
 
 ## Contact
