@@ -40,6 +40,16 @@ class Judoka_Model {
         return $this->wpdb->get_results($query);
     }
 
+    public function get_distinct_categories() {
+        $query = "SELECT DISTINCT category FROM $this->table_name ORDER BY category ASC";
+        return $this->wpdb->get_col($query);
+    }
+
+    public function get_distinct_clubs() {
+        $query = "SELECT DISTINCT club FROM $this->table_name ORDER BY club ASC";
+        return $this->wpdb->get_col($query);
+    }
+
     public function update($id, $data) {
         $fields = [
             'full_name' => sanitize_text_field($data['full_name']),
