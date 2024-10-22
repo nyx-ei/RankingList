@@ -11,7 +11,7 @@ $judokas = $judoka_model->get_all();
 
 <div class="wrap">
     <h1 class="wp-heading-inline">List of Judokas</h1>
-    <a href="?page=ajouter-judoka" class="page-title-action">Add a new Judoka</a>
+    <a href="?page=add-judoka" class="page-title-action">Add a new Judoka</a>
 
     <?php if (!empty($_GET['message'])): ?>
         <div class="notice notice-success">

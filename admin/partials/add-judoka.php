@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 <div class="wrap">
     <h1>Add a Judoka</h1>
     <form method="post" action="" enctype="multipart/form-data" id="form-judoka">
-        <?php wp_nonce_field('ajouter_judoka_nonce', 'judoka_nonce'); ?>
+        <?php wp_nonce_field('add_judoka_nonce', 'judoka_nonce'); ?>
         
         <table class="form-table">
             <tr>

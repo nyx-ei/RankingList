@@ -50,12 +50,12 @@ class Judoka_Admin {
     }
 
     public function handle_add_judoka() {
-        if (!wp_verify_nonce($_POST['judoka_nonce'], 'ajouter_judoka_nonce')) {
+        if (!wp_verify_nonce($_POST['judoka_nonce'], 'add_judoka_nonce')) {
             wp_send_json_error('Nonce invalide');
         }
 
-        if ($this->judoka_model->exists($_POST['nom_complet'], $_POST['date_naissance'])) {
-            wp_send_json_error('Ce judoka existe déjà');
+        if ($this->judoka_model->exists($_POST['full_name'], $_POST['birth_date'])) {
+            wp_send_json_error('This judoka already exists!');
         }
 
         $photo_url = '';
