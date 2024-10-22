@@ -1,0 +1,79 @@
+.wrap {
+    max-width: 1200px;
+    margin: 20px;
+}
+
+.form-table {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.form-table th {
+    width: 200px;
+    padding: 15px;
+}
+
+.form-table td {
+    padding: 15px;
+}
+
+.competition-entry {
+    margin-top: 20px;
+    border: 1px solid #ccd0d4;
+    background: #f8f9fa;
+}
+
+.competition-entry h4 {
+    margin: 0;
+    padding: 10px;
+    background: #f1f1f1;
+    border-bottom: 1px solid #ccd0d4;
+}
+
+.remove-competition {
+    color: #dc3232;
+    margin-left: 10px;
+}
+
+.notice {
+    margin: 15px 0;
+    padding: 10px;
+    border-left: 4px solid #00a0d2;
+}
+
+.notice-success {
+    border-left-color: #46b450;
+}
+
+.notice-error {
+    border-left-color: #dc3232;
+}
+
+.photo-preview {
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.button {
+    margin: 5px;
+}
+
+#add-competition {
+    margin: 20px 0;
+}
+
+@media screen and (max-width: 782px) {
+    .form-table th {
+        width: 100%;
+        display: block;
+    }
+    
+    .form-table td {
+        display: block;
+        padding: 10px;
+    }
+}
