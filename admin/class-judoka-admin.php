@@ -30,7 +30,7 @@ class Judoka_Admin
             $menu['icon'],
         );
 
-        $submenu = $this->config_menu['submenu'];
+        $submenu = $this->config_menu['submenu']['add_judoka'];
         add_submenu_page(
             $menu['menu_slug'],
             $submenu['page_title'],
