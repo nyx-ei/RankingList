@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 
 $judoka_model = new Judoka_Model();
 $competition_model = new Competition_Model();
-$judokas = $judoka_model->get_all();
+$judokas = $judoka_model->get_judokas();
 ?>
 
 <div class="wrap">
@@ -66,7 +66,7 @@ $judokas = $judoka_model->get_all();
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($judokas as $judoka): 
+            <?php foreach ($judokas as $judoka):
                 $age = date_diff(date_create($judoka->birth_date), date_create('today'))->y;
                 $points = $competition_model->get_total_points($judoka->id);
                 $medals = $competition_model->get_medals_count($judoka->id);
@@ -74,7 +74,7 @@ $judokas = $judoka_model->get_all();
                 <tr>
                     <td>
                         <?php if (!empty($judoka->photo_profile)): ?>
-                            <img src="<?php echo esc_url($judoka->photo_profile); ?>" 
+                            <img src="<?php echo esc_url($judoka->photo_profile); ?>"
                                  alt="Photo de <?php echo esc_attr($judoka->nom_complet); ?>"
                                  style="width: 50px; height: 50px; object-fit: cover;">
                         <?php endif; ?>
@@ -93,14 +93,14 @@ $judokas = $judoka_model->get_all();
                         <?php endforeach; ?>
                     </td>
                     <td>
-                        <a href="?page=edit-judoka&id=<?php echo $judoka->id; ?>" 
+                        <a href="?page=edit-judoka&id=<?php echo $judoka->id; ?>"
                            class="button button-small">Edit</a>
-                        <button class="button button-small delete-judoka" 
+                        <button class="button button-small delete-judoka"
                                 data-id="<?php echo $judoka->id; ?>"
                                 data-name="<?php echo esc_attr($judoka->full_name); ?>">
                             Delete
                         </button>
-                        <a href="?page=view-judoka&id=<?php echo $judoka->id; ?>" 
+                        <a href="?page=view-judoka&id=<?php echo $judoka->id; ?>"
                            class="button button-small">Details</a>
                     </td>
                 </tr>
@@ -114,12 +114,12 @@ jQuery(document).ready(function($) {
     $('#filter-submit').on('click', function() {
         const category = $('#filter-category').val();
         const club = $('#filter-club').val();
-        
+
         $('table tbody tr').each(function() {
             const $row = $(this);
             const showCategory = !category || $row.find('td:eq(3)').text() === category;
             const showClub = !club || $row.find('td:eq(4)').text() === club;
-            
+
             $row.toggle(showCategory && showClub);
         });
     });
@@ -127,7 +127,7 @@ jQuery(document).ready(function($) {
     $('.delete-judoka').on('click', function() {
         const id = $(this).data('id');
         const name = $(this).data('name');
-        
+
         if (confirm(`Are you sure you want to delete ${name}?`)) {
             $.post(ajaxurl, {
                 action: 'delete_judoka',
@@ -144,4 +144,3 @@ jQuery(document).ready(function($) {
     });
 });
 </script>
-

@@ -13,8 +13,16 @@ if (!defined('ABSPATH')) {
 
         <table class="form-table">
             <tr>
+                <th><label for="first_name">First name</label></th>
+                <td><input type="text" id="first_name" name="first_name" class="regular-text" required></td>
+            </tr>
+            <tr>
+                <th><label for="last_name">Last name</label></th>
+                <td><input type="text" id="last_name" name="last_name" class="regular-text" required></td>
+            </tr>
+            <tr>
                 <th><label for="full_name">Full Name</label></th>
-                <td><input type="text" id="full_name" name="full_name" class="regular-text" required></td>
+                <td><input type="text" id="full_name" name="full_name" class="regular-text" required readonly></td>
             </tr>
             <tr>
                 <th><label for="birth_date">Birthdate</label></th>
@@ -113,3 +121,20 @@ if (!defined('ABSPATH')) {
         <?php submit_button('Add the Judoka'); ?>
     </form>
 </div>
+
+<script>
+function normalizeText(text) {
+    return text.trim().toUpperCase();
+}
+
+function updateFullName() {
+    const firstName = document.getElementById("first_name").value;
+    const lastName = document.getElementById("last_name").value;
+
+    const fullName = `${normalizeText(firstName)} ${normalizeText(lastName)}`;
+    document.getElementById("full_name").value = fullName;
+}
+
+document.getElementById("first_name").addEventListener("input", updateFullName);
+document.getElementById("last_name").addEventListener("input", updateFullName);
+</script>

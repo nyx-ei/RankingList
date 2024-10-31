@@ -8,7 +8,7 @@ $judoka_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $judoka_model = new Judoka_Model();
 $competition_model = new Competition_Model();
 
-$judoka = $judoka_model->get($judoka_id);
+$judoka = $judoka_model->get_judoka($judoka_id);
 
 if (!$judoka) {
     wp_die('Judoka not found');
@@ -26,74 +26,77 @@ $competitions = $competition_model->get_by_judoka($judoka_id);
 
         <table class="form-table">
             <tr>
-                <th><label for="full_name">Full Name</label></th>
+                <th><label for="first_name">First Name</label></th>
                 <td>
-                    <input type="text" id="full_name" name="full_name"
-                           class="regular-text" required
-                           value="<?php echo esc_attr($judoka->full_name); ?>">
+                    <input type="text" id="first_name" class="regular-text" required>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="last_name">Last Name</label></th>
+                <td>
+                    <input type="text" id="last_name" class="regular-text" required>
+                </td>
+            </tr>
+            <tr style="display: none;">
+                <td colspan="2">
+                    <input type="hidden" id="full_name" name="full_name"
+                        value="<?php echo esc_attr($judoka->full_name); ?>">
                 </td>
             </tr>
             <tr>
                 <th><label for="birth_date">Birthdate</label></th>
                 <td>
-                    <input type="date" id="birth_date" name="birth_date"
-                           required value="<?php echo esc_attr($judoka->birth_date); ?>">
+                    <input type="date" id="birth_date" name="birth_date" required
+                        value="<?php echo esc_attr($judoka->birth_date); ?>">
                 </td>
             </tr>
             <tr>
                 <th><label for="category">Category</label></th>
                 <td>
-                    <input type="text" id="category" name="category"
-                           class="regular-text" required
-                           value="<?php echo esc_attr($judoka->category); ?>">
+                    <input type="text" id="category" name="category" class="regular-text" required
+                        value="<?php echo esc_attr($judoka->category); ?>">
                 </td>
             </tr>
             <tr>
                 <th><label for="weight">Weight</label></th>
                 <td>
-                    <input type="number" id="weight" name="weight"
-                           class="regular-text" required
-                           value="<?php echo esc_attr($judoka->weight); ?>">
+                    <input type="number" id="weight" name="weight" class="regular-text" required
+                        value="<?php echo esc_attr($judoka->weight); ?>">
                 </td>
             </tr>
             <tr>
                 <th><label for="club">Club</label></th>
                 <td>
-                    <input type="text" id="club" name="club"
-                           class="regular-text" required
-                           value="<?php echo esc_attr($judoka->club); ?>">
+                    <input type="text" id="club" name="club" class="regular-text" required
+                        value="<?php echo esc_attr($judoka->club); ?>">
                 </td>
             </tr>
             <tr>
                 <th><label for="grade">Grade</label></th>
                 <td>
-                    <input type="text" id="grade" name="grade"
-                           class="regular-text" required
-                           value="<?php echo esc_attr($judoka->grade); ?>">
+                    <input type="text" id="grade" name="grade" class="regular-text" required
+                        value="<?php echo esc_attr($judoka->grade); ?>">
                 </td>
             </tr>
             <tr>
                 <th><label for="gender">Gender</label></th>
                 <td>
-                    <input type="text" id="gender" name="gender"
-                           class="regular-text" required
-                           value="<?php echo esc_attr($judoka->gender); ?>">
+                    <input type="text" id="gender" name="gender" class="regular-text" required
+                        value="<?php echo esc_attr($judoka->gender); ?>">
                 </td>
             </tr>
             <tr>
                 <th><label for="photo_profile">Photo profile</label></th>
                 <td>
-                    <input type="file" id="photo_profile" name="photo_profile"
-                           class="regular-text" required
-                           value="<?php echo esc_attr($judoka->photo_profile); ?>">
+                    <input type="file" id="photo_profile" name="photo_profile" class="regular-text" required
+                        value="<?php echo esc_attr($judoka->photo_profile); ?>">
                 </td>
             </tr>
             <tr>
                 <th><label for="images">Images</label></th>
                 <td>
-                    <input type="file" id="images" name="images"
-                           class="regular-text" required
-                           value="<?php echo esc_attr($judoka->images); ?>">
+                    <input type="file" id="images" name="images" class="regular-text" required
+                        value="<?php echo esc_attr($judoka->images); ?>">
                 </td>
             </tr>
 
@@ -107,7 +110,7 @@ $competitions = $competition_model->get_by_judoka($judoka_id);
                         <th colspan="2">
                             <h4>Competition <?php echo $index + 1; ?></h4>
                             <input type="hidden" name="competitions[<?php echo $index; ?>][id]"
-                                   value="<?php echo $competition->id; ?>">
+                                value="<?php echo $competition->id; ?>">
                             <button type="button" class="button remove-competition">
                                 Delete this competition
                             </button>
@@ -115,19 +118,23 @@ $competitions = $competition_model->get_by_judoka($judoka_id);
                     </tr>
                     <tr>
                         <th><label for="competition_name">Competition name</label></th>
-                        <td><input type="text" name="competitions[<?php echo $index; ?>][competition_name]" class="regular-text" value="<?php echo esc_attr($competition->competition_name); ?>"></td>
+                        <td><input type="text" name="competitions[<?php echo $index; ?>][competition_name]"
+                                class="regular-text" value="<?php echo esc_attr($competition->competition_name); ?>"></td>
                     </tr>
                     <tr>
                         <th><label for="date_competition">Competition date</label></th>
-                        <td><input type="date" name="competitions[<?php echo $index; ?>][date_competition]" value="<?php echo esc_attr($competition->date_competition); ?>"></td>
+                        <td><input type="date" name="competitions[<?php echo $index; ?>][date_competition]"
+                                value="<?php echo esc_attr($competition->date_competition); ?>"></td>
                     </tr>
                     <tr>
                         <th><label for="points">Points gagnés</label></th>
-                        <td><input type="number" name="competitions[<?php echo $index; ?>][points]" min="0" value="<?php echo esc_attr($competition->points); ?>"></td>
+                        <td><input type="number" name="competitions[<?php echo $index; ?>][points]" min="0"
+                                value="<?php echo esc_attr($competition->points); ?>"></td>
                     </tr>
                     <tr>
                         <th><label for="rang">Rank</label></th>
-                        <td><input type="number" name="competitions[<?php echo $index; ?>][rang]" min="1" value="<?php echo esc_attr($competition->rang); ?>"></td>
+                        <td><input type="number" name="competitions[<?php echo $index; ?>][rang]" min="1"
+                                value="<?php echo esc_attr($competition->rang); ?>"></td>
                     </tr>
                     <tr>
                         <th><label for="medals">Medals</label></th>
@@ -152,3 +159,24 @@ $competitions = $competition_model->get_by_judoka($judoka_id);
         <?php submit_button('Update the Judoka'); ?>
     </form>
 </div>
+
+<script>
+function updateFullName() {
+    const firstName = document.getElementById("first_name").value;
+    const lastName = document.getElementById("last_name").value;
+    const fullName = `${firstName.trim().toUpperCase()} ${lastName.trim().toUpperCase()}`;
+    document.getElementById("full_name").value = fullName;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const fullName = "<?php echo esc_attr($judoka->full_name); ?>";
+    const [firstName, ...lastName] = fullName.split(" ");
+    document.getElementById("first_name").value = firstName;
+    document.getElementById("last_name").value = lastName.join(" ");
+
+    updateFullName();
+});
+
+document.getElementById("first_name").addEventListener("input", updateFullName);
+document.getElementById("last_name").addEventListener("input", updateFullName);
+</script>
