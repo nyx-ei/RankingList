@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
                 <td><input type="text" id="full_name" name="full_name" class="regular-text" required></td>
             </tr>
             <tr>
-                <th><label for="birth_date">Birth Date</label></th>
+                <th><label for="birth_date">Birthdate</label></th>
                 <td><input type="date" id="birth_date" name="birth_date" required></td>
             </tr>
             <tr>
