@@ -1,7 +1,7 @@
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     let competitionCount = 0;
 
-    $('#add-competition').on('click', function() {
+    $('#add-competition').on('click', function () {
         competitionCount++;
         const template = `
             <table class="form-table competition-entry">
@@ -43,16 +43,19 @@ jQuery(document).ready(function($) {
         $('#competitions-container').append(template);
     });
 
-    $(document).on('click', '.remove-competition', function() {
+    $(document).on('click', '.remove-competition', function () {
         $(this).closest('.competition-entry').remove();
     });
 
-    $('#form-judoka').on('submit', function(e) {
+    $('#form-judoka').on('submit', function (e) {
         e.preventDefault();
         const form = $(this);
         const formData = new FormData(this);
 
-        form.find('input[type="submit"]').prop('disabled', true);
+        formData.append('action', 'add_judoka');
+        formData.append('judoka_nonce', judokaAjax.judoka_nonce);
+
+        form.find('input[type="submit"]').prop('disabled', false);
         form.append('<div class="notice notice-info"><p>Sending...</p></div>');
 
         $.ajax({
@@ -61,31 +64,32 @@ jQuery(document).ready(function($) {
             data: formData,
             processData: false,
             contentType: false,
-            success: function(response) {
+            success: function (response) {
+                console.log('Response:', response);
                 form.find('.notice').remove();
                 if (response.success) {
                     form.append('<div class="notice notice-success"><p>Judoka successfully added!</p></div>');
-                    setTimeout(function() {
-                        window.location.href = 'admin.php?page=manage-judokas';
+                    setTimeout(function () {
+                        window.location.href = 'admin.php?page=judokas-management';
                     }, 2000);
                 } else {
                     form.append(`<div class="notice notice-error"><p>Error: ${response.data}</p></div>`);
                     form.find('input[type="submit"]').prop('disabled', false);
                 }
             },
-            error: function() {
+            error: function () {
                 form.find('.notice').remove();
                 form.append('<div class="notice notice-error"><p>Server connection error</p></div>');
-                form.find('input[type="submit"]').prop('disabled', false);
+                form.find('input[type="submit"]').prop('disabled', true);
             }
         });
     });
 
-    $('#photo_profile').on('change', function() {
+    $('#photo_profile').on('change', function () {
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const preview = $('<img>').attr({
                     src: e.target.result,
                     class: 'photo-preview',

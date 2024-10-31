@@ -37,9 +37,9 @@ class Judoka_Model {
             'weight' => floatval($data['weight']),
             'club' => sanitize_text_field($data['club']),
             'grade' => sanitize_text_field($data['grade']),
-            'gender' => sanitize_text_field($data['sexe']),
+            'gender' => sanitize_text_field($data['gender']),
             'photo_profile' => sanitize_text_field($data['photo_profile']),
-            'images' => isset($data['images']) ? sanitize_text_field($data['images']) : ''
+            'images' => !empty($data['images']) ? json_encode($data['images']) : ''
         ];
 
         return $this->wpdb->insert($this->table_name, $fields);
