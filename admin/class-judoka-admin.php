@@ -1,13 +1,16 @@
 <?php
 
-class Judoka_Admin {
+class Judoka_Admin
+{
     private $judoka_model;
     private $competition_model;
+    private $config_menu;
 
     public function __construct()
     {
         $this->judoka_model = new Judoka_Model();
         $this->competition_model = new Competition_Model();
+        $this->config_menu = JUDOKA_ADMIN_MENU_CONFIG;
 
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
@@ -15,41 +18,48 @@ class Judoka_Admin {
         add_action('wp_ajax_modifier_judoka', array($this, 'handle_edit_judoka'));
     }
 
-    public function add_admin_menu() {
+    public function add_admin_menu()
+    {
+        $menu = $this->config_menu['menu'];
         add_menu_page(
-            'Judokas Management',
-            'Judokas',
-            'manage_options',
-            'judokas-management',
+            $menu['page_title'],
+            $menu['menu_title'],
+            $menu['capability'],
+            $menu['menu_slug'],
             array($this, 'display_judoka_list'),
-            'dashicons-groups'
+            $menu['icon'],
         );
 
+        $submenu = $this->config_menu['submenu'];
         add_submenu_page(
-            'judokas-management',
-            'Add a Judoka',
-            'Add a Judoka',
-            'manage_options',
-            'add-judoka',
+            $menu['menu_slug'],
+            $submenu['page_title'],
+            $submenu['menu_title'],
+            $submenu['capability'],
+            $submenu['menu_slug'],
             array($this, 'display_add_judoka')
         );
     }
 
-    public function enqueue_admin_scripts() {
+    public function enqueue_admin_scripts()
+    {
         wp_enqueue_style('judoka-admin-css', JUDOKA_PLUGIN_URL . 'admin/css/judoka-admin.css');
         wp_enqueue_script('judoka-admin-js', JUDOKA_PLUGIN_URL . 'admin/js/judoka-admin.js', array('jquery'));
         wp_localize_script('judoka-admin-js', 'judokaAjax', array('ajaxurl' => admin_url('admin-ajax.php')));
     }
 
-    public function display_judoka_list() {
+    public function display_judoka_list()
+    {
         include JUDOKA_PLUGIN_DIR . 'admin/partials/list-judokas.php';
     }
 
-    public function display_add_judoka() {
+    public function display_add_judoka()
+    {
         include JUDOKA_PLUGIN_DIR . 'admin/partials/add-judoka.php';
     }
 
-    public function handle_add_judoka() {
+    public function handle_add_judoka()
+    {
         if (!wp_verify_nonce($_POST['judoka_nonce'], 'add_judoka_nonce')) {
             wp_send_json_error('Nonce invalide');
         }
@@ -69,19 +79,19 @@ class Judoka_Admin {
         $images_urls = array();
         if (isset($_FILES['images'])) {
             foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
-               if ($_FILES['images']['error'][$key] == 0) {
-                 $file = array(
-                     'name' => $_FILES['images']['name'][$key],
-                     'type'=> $_FILES['images']['type'][$key],
-                     'tmp_name' => $_FILES['images']['tmp_name'][$key],
-                     'error' => $_FILES['images']['error'][$key],
-                     'size' => $_FILES['images']['size'][$key],
-                 );
-                 $upload = wp_handle_upload($file, array('test_form' => false));
-                 if (!isset($upload['error'])) {
-                    $images_urls[] = $upload['url'];
-                 }
-               }
+                if ($_FILES['images']['error'][$key] == 0) {
+                    $file = array(
+                        'name' => $_FILES['images']['name'][$key],
+                        'type' => $_FILES['images']['type'][$key],
+                        'tmp_name' => $_FILES['images']['tmp_name'][$key],
+                        'error' => $_FILES['images']['error'][$key],
+                        'size' => $_FILES['images']['size'][$key],
+                    );
+                    $upload = wp_handle_upload($file, array('test_form' => false));
+                    if (!isset($upload['error'])) {
+                        $images_urls[] = $upload['url'];
+                    }
+                }
             }
         }
 
