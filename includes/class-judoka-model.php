@@ -28,7 +28,7 @@ class Judoka_Model {
      *
      * @return int|false The number of rows inserted, or false on error.
      */
-    public function create($data) {
+    public function create_judoka($data) {
 
         $fields = [
             'full_name' => sanitize_text_field($data['full_name']),
@@ -52,7 +52,7 @@ class Judoka_Model {
      * @param int $id The ID of the judoka to retrieve.
      * @return object|false The retrieved judoka object on success, false if not found.
      */
-    public function get($id) {
+    public function get_judoka($id) {
         $query = $this->wpdb->prepare("SELECT * FROM $this->table_name WHERE id = %d", $id);
         return $this->wpdb->get_row($query);
     }
@@ -62,7 +62,7 @@ class Judoka_Model {
      *
      * @return array List of all judokas.
      */
-    public function get_all() {
+    public function get_judokas() {
         $query = "SELECT * FROM $this->table_name ORDER BY full_name ASC";
         return $this->wpdb->get_results($query);
     }
@@ -95,7 +95,7 @@ class Judoka_Model {
      *
      * @return int|false The number of rows updated, or false on error
      */
-    public function update($id, $data) {
+    public function update_judoka($id, $data) {
         $fields = [
             'full_name' => sanitize_text_field($data['full_name']),
             'birth_date' => sanitize_text_field($data['birth_date']),
@@ -117,7 +117,7 @@ class Judoka_Model {
      * @param int $id The ID of the judoka to delete.
      * @return int|false The number of rows deleted, or false on error.
      */
-    public function delete($id) {
+    public function delete_judoka($id) {
         return $this->wpdb->delete($this->table_name, ['id' => $id]);
     }
 
@@ -129,7 +129,7 @@ class Judoka_Model {
      *
      * @return int|false The ID of the judoka if it exists, false otherwise.
      */
-    public function exists($full_name, $birthday) {
+    public function judoka_exists($full_name, $birthday) {
         return $this->wpdb->get_var(
             $this->wpdb->prepare(
                 "SELECT id FROM {$this->table_name} WHERE full_name = %s AND birthday = %s",
