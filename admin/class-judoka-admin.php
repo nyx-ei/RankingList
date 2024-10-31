@@ -69,10 +69,19 @@ class Judoka_Admin {
         $images_urls = array();
         if (isset($_FILES['images'])) {
             foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
-                $upload = wp_handle_upload($_FILES['images'], array('test_form' => false));
-                if (!isset($upload['error'])) {
+               if ($_FILES['images']['error'][$key] == 0) {
+                 $file = array(
+                     'name' => $_FILES['images']['name'][$key],
+                     'type'=> $_FILES['images']['type'][$key],
+                     'tmp_name' => $_FILES['images']['tmp_name'][$key],
+                     'error' => $_FILES['images']['error'][$key],
+                     'size' => $_FILES['images']['size'][$key],
+                 );
+                 $upload = wp_handle_upload($file, array('test_form' => false));
+                 if (!isset($upload['error'])) {
                     $images_urls[] = $upload['url'];
-                }
+                 }
+               }
             }
         }
 
@@ -88,11 +97,11 @@ class Judoka_Admin {
             'images' => $images_urls
         );
 
-        
+
         $judoka_id = $this->judoka_model->create($judoka_data);
 
         if ($judoka_id) {
-            
+
             if (!empty($_POST['competition_name'])) {
                 $competition_data = array(
                     'judoka_id' => $judoka_id,
