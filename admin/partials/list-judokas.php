@@ -121,24 +121,5 @@ jQuery(document).ready(function($) {
             $row.toggle(showCategory && showClub);
         });
     });
-
-    $('.delete-judoka').on('click', function() {
-        const id = $(this).data('id');
-        const name = $(this).data('name');
-
-        if (confirm(`Are you sure you want to delete ${name}?`)) {
-            $.post(ajaxurl, {
-                action: 'delete_judoka',
-                id: id,
-                nonce: '<?php echo wp_create_nonce('delete_judoka_nonce'); ?>'
-            }, function(response) {
-                if (response.success) {
-                    location.reload();
-                } else {
-                    alert('Error during deletion');
-                }
-            });
-        }
-    });
 });
 </script>

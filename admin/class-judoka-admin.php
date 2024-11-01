@@ -16,6 +16,7 @@ class Judoka_Admin
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
         add_action('wp_ajax_add_judoka', array($this, 'handle_add_judoka'));
         add_action('wp_ajax_edit_judoka', array($this, 'handle_edit_judoka'));
+        add_action('wp_ajax_delete_judoka', array($this, 'handle_delete_judoka'));
     }
 
     public function add_admin_menu()
@@ -59,6 +60,7 @@ class Judoka_Admin
             'ajaxurl' => admin_url('admin-ajax.php'),
             'judoka_nonce' => wp_create_nonce('add_judoka_nonce'),
             'judoka_edit_nonce' => wp_create_nonce('edit_judoka_nonce'),
+            'judoka_delete_nonce' => wp_create_nonce('delete_judoka_nonce'),
         ));
     }
 
@@ -180,7 +182,7 @@ class Judoka_Admin
             }
         }
 
-        $existing_images = !empty($judoka_exits->images) ? json_decode($judoka_exits->images, true):array();
+        $existing_images = !empty($judoka_exits->images) ? json_decode($judoka_exits->images, true) : array();
         $images_urls = $existing_images;
 
         if (isset($_FILES['images'])) {
@@ -244,6 +246,67 @@ class Judoka_Admin
             wp_send_json_success('Judoka successfully updated');
         } else {
             wp_send_json_error('Error updating judoka');
+        }
+    }
+
+    public function handle_delete_judoka()
+    {
+        if (!wp_verify_nonce( $_POST['judoka_delete_nonce'], 'delete_judoka_nonce')) {
+            wp_send_json_error('Invalid Nonce');
+            return;
+        }
+
+        if (!isset($_POST['judoka_id']) || empty($_POST['judoka_id'])) {
+            wp_send_json_error('ID judoka is required');
+            return;
+        }
+
+        $judoka_id = intval($_POST['judoka_id']);
+        $judoka = $this->judoka_model->get_judoka( $judoka_id );
+
+        if (!$judoka) {
+            wp_send_json_error('Judoka not found');
+            return;
+        }
+
+        $competition_delete = $this->competition_model->delete_by_judoka( $judoka_id );
+        $judoka_delete = $this->judoka_model->delete_judoka( $judoka_id );
+
+        if ($judoka_delete && $competition_delete !== false) {
+            $this->delete_judoka_files($judoka);
+            wp_send_json_success('Judoka successfully deleted!');
+        } else {
+            error_log('Judoka deletion failed');
+            error_log('Judoka delete result: ' . print_r($judoka_delete, true));
+            error_log('Competitions delete result: ' . print_r($competition_delete, true));
+
+            wp_send_json_error('Error deleting judoka');
+        }
+    }
+
+    private function delete_judoka_files($judoka)
+    {
+        if (!empty($judoka->photo_profile)) {
+            $this->delete_uploaded_file($judoka->photo_profile);
+        }
+
+        if (!empty($judoka->images)) {
+            $images = json_decode($judoka->images, true);
+            if (is_array($images)) {
+                foreach ($images as $image_url) {
+                    $this->delete_uploaded_file($image_url);
+                }
+            }
+        }
+    }
+
+    private function delete_uploaded_file($file_url)
+    {
+        $upload_dir = wp_upload_dir();
+        $file_path = str_replace($upload_dir['baseurl'], $upload_dir['basedir'], $file_url);
+
+        if (file_exists($file_path)) {
+            unlink($file_path);
         }
     }
 }

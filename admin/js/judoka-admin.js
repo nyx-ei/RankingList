@@ -123,6 +123,53 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    //delete judoka
+    $('.delete-judoka').on('click', function(e) {
+        e.preventDefault();
+
+        const button = $(this);
+        const id = button.data('id');
+        const name = button.data('name');
+        const row = button.closest('tr');
+
+        if (confirm(`Are you sure you want to delete ${name}?`)) {
+            $.ajax({
+                url: judokaAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'delete_judoka',
+                    judoka_id: id,
+                    judoka_delete_nonce: judokaAjax.judoka_delete_nonce
+                },
+                beforeSend: function() {
+                    button.prop('disabled', true).text('Deleting...');
+                },
+                success: function(response) {
+                    console.log(response);
+                    window.location.href = 'admin.php?page=judokas-management';
+                    if (response.success) {
+                        row.fadeOut(500, function() {
+                            $(this).remove();
+                        });
+                        $('<div class="notice notice-success"><p>Judoka successfully deleted!</p></div>')
+                            .insertBefore('.wp-list-table')
+                            .delay(3000)
+                            .fadeOut(500, function() {
+                                $(this).remove();
+                            });
+                    } else {
+                        alert('Error: ' + response.data);
+                        button.prop('disabled', false).text('Delete');
+                    }
+                },
+                error: function() {
+                    alert('Server connection error');
+                    button.prop('disabled', false).text('Delete');
+                }
+            });
+        }
+    });
+
     $('#photo_profile').on('change', function () {
         const file = this.files[0];
         if (file) {
