@@ -21,7 +21,7 @@ $competitions = $competition_model->get_by_judoka($judoka_id);
     <h1>Edit Judoka</h1>
 
     <form method="post" action="" enctype="multipart/form-data" id="form-edit-judoka">
-        <?php wp_nonce_field('edit_judoka_nonce', 'judoka_nonce'); ?>
+        <?php wp_nonce_field('edit_judoka_nonce', 'judoka_edit_nonce'); ?>
         <input type="hidden" name="judoka_id" value="<?php echo $judoka_id; ?>">
 
         <table class="form-table">
@@ -88,15 +88,16 @@ $competitions = $competition_model->get_by_judoka($judoka_id);
             <tr>
                 <th><label for="photo_profile">Photo profile</label></th>
                 <td>
-                    <input type="file" id="photo_profile" name="photo_profile" class="regular-text" required
+                    <input type="file" id="photo_profile" name="photo_profile" class="regular-text"
                         value="<?php echo esc_attr($judoka->photo_profile); ?>">
                 </td>
             </tr>
             <tr>
                 <th><label for="images">Images</label></th>
                 <td>
-                    <input type="file" id="images" name="images" class="regular-text" required
-                        value="<?php echo esc_attr($judoka->images); ?>">
+                    <input type="file" id="images" name="images[]" class="regular-text" accept="image/*"
+                        value="<?php echo esc_attr($judoka->images); ?>" multiple>
+                    <p class="description">You can select multiple images</p>
                 </td>
             </tr>
 
@@ -161,22 +162,22 @@ $competitions = $competition_model->get_by_judoka($judoka_id);
 </div>
 
 <script>
-function updateFullName() {
-    const firstName = document.getElementById("first_name").value;
-    const lastName = document.getElementById("last_name").value;
-    const fullName = `${firstName.trim().toUpperCase()} ${lastName.trim().toUpperCase()}`;
-    document.getElementById("full_name").value = fullName;
-}
+    function updateFullName() {
+        const firstName = document.getElementById("first_name").value;
+        const lastName = document.getElementById("last_name").value;
+        const fullName = `${firstName.trim().toUpperCase()} ${lastName.trim().toUpperCase()}`;
+        document.getElementById("full_name").value = fullName;
+    }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const fullName = "<?php echo esc_attr($judoka->full_name); ?>";
-    const [firstName, ...lastName] = fullName.split(" ");
-    document.getElementById("first_name").value = firstName;
-    document.getElementById("last_name").value = lastName.join(" ");
+    document.addEventListener("DOMContentLoaded", () => {
+        const fullName = "<?php echo esc_attr($judoka->full_name); ?>";
+        const [firstName, ...lastName] = fullName.split(" ");
+        document.getElementById("first_name").value = firstName;
+        document.getElementById("last_name").value = lastName.join(" ");
 
-    updateFullName();
-});
+        updateFullName();
+    });
 
-document.getElementById("first_name").addEventListener("input", updateFullName);
-document.getElementById("last_name").addEventListener("input", updateFullName);
+    document.getElementById("first_name").addEventListener("input", updateFullName);
+    document.getElementById("last_name").addEventListener("input", updateFullName);
 </script>

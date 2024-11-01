@@ -47,6 +47,7 @@ jQuery(document).ready(function ($) {
         $(this).closest('.competition-entry').remove();
     });
 
+    //add new judoka
     $('#form-judoka').on('submit', function (e) {
         e.preventDefault();
         const form = $(this);
@@ -65,10 +66,47 @@ jQuery(document).ready(function ($) {
             processData: false,
             contentType: false,
             success: function (response) {
-                console.log('Response:', response);
                 form.find('.notice').remove();
                 if (response.success) {
                     form.append('<div class="notice notice-success"><p>Judoka successfully added!</p></div>');
+                    setTimeout(function () {
+                        window.location.href = 'admin.php?page=judokas-management';
+                    }, 2000);
+                } else {
+                    form.append(`<div class="notice notice-error"><p>Error: ${response.data}</p></div>`);
+                    form.find('input[type="submit"]').prop('disabled', false);
+                }
+            },
+            error: function () {
+                form.find('.notice').remove();
+                form.append('<div class="notice notice-error"><p>Server connection error</p></div>');
+                form.find('input[type="submit"]').prop('disabled', true);
+            }
+        });
+    });
+
+    //edit judoka
+    $('#form-edit-judoka').on('submit', function (e) {
+        e.preventDefault();
+        const form = $(this);
+        const formData = new FormData(this);
+
+        formData.append('action', 'edit_judoka');
+        formData.append('judoka_edit_nonce', judokaAjax.judoka_edit_nonce);
+
+        form.find('input[type="submit"]').prop('disabled', false);
+        form.append('<div class="notice notice-info"><p>Sending...</p></div>');
+
+        $.ajax({
+            url: judokaAjax.ajaxurl,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                form.find('.notice').remove();
+                if (response.success) {
+                    form.append('<div class="notice notice-success"><p>Judoka successfully updated!</p></div>');
                     setTimeout(function () {
                         window.location.href = 'admin.php?page=judokas-management';
                     }, 2000);

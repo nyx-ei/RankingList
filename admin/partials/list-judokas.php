@@ -75,7 +75,7 @@ $judokas = $judoka_model->get_judokas();
                     <td>
                         <?php if (!empty($judoka->photo_profile)): ?>
                             <img src="<?php echo esc_url($judoka->photo_profile); ?>"
-                                 alt="Photo de <?php echo esc_attr($judoka->nom_complet); ?>"
+                                 alt="Photo de <?php echo esc_attr($judoka->full_name); ?>"
                                  style="width: 50px; height: 50px; object-fit: cover;">
                         <?php endif; ?>
                     </td>
@@ -100,8 +100,6 @@ $judokas = $judoka_model->get_judokas();
                                 data-name="<?php echo esc_attr($judoka->full_name); ?>">
                             Delete
                         </button>
-                        <a href="?page=view-judoka&id=<?php echo $judoka->id; ?>"
-                           class="button button-small">Details</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
