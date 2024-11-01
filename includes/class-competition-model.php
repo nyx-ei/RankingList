@@ -128,8 +128,8 @@ class Competition_Model {
     public function get_medals_count($judoka_id) {
         return $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT medaille, COUNT(*) as count 
-                FROM {$this->table_name} 
+                "SELECT medals, COUNT(*) as count
+                FROM {$this->table_name}
                 WHERE judoka_id = %d AND medals != ''
                 GROUP BY medals",
                 $judoka_id

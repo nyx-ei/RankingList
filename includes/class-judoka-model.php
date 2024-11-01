@@ -129,12 +129,12 @@ class Judoka_Model {
      *
      * @return int|false The ID of the judoka if it exists, false otherwise.
      */
-    public function judoka_exists($full_name, $birthday) {
+    public function judoka_exists($full_name, $birth_date) {
         return $this->wpdb->get_var(
             $this->wpdb->prepare(
-                "SELECT id FROM {$this->table_name} WHERE full_name = %s AND birthday = %s",
+                "SELECT id FROM {$this->table_name} WHERE full_name = %s AND birth_date = %s",
                 $full_name,
-                $birthday
+                $birth_date
             )
         );
     }
