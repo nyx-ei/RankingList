@@ -170,6 +170,47 @@ jQuery(document).ready(function ($) {
         }
     });
 
+    //import data
+    $('#form-import-judoka').on('submit', function (e) {
+        e.preventDefault();
+
+        const form = $(this);
+        const formData = new FormData(this);
+
+        formData.append('action', 'import_judokas');
+        formData.append('judoka_import_nonce', judokaAjax.judoka_import_nonce);
+
+        form.find('input[type="submit"]').prop('disabled', true);
+        form.append('<div class="notice notice-info"><p>Importing...</p></div>');
+
+        $.ajax({
+            url: judokaAjax.ajaxurl,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                form.find('.notice').remove();
+                form.find('input[type="submit"]').prop('disabled', false);
+
+                if (response.success) {
+                    form.append(`<div class="notice notice-success"><p>${response.data.message}</p></div>`);
+                    setTimeout(function () {
+                        window.location.href = 'admin.php?page=judokas-management&import=success&count=' + response.data.count;
+                    }, 2000);
+                } else {
+                    form.append(`<div class="notice notice-error"><p>Error: ${response.data}</p></div>`);
+                }
+            },
+            error: function () {
+                form.find('.notice').remove();
+                form.append('<div class="notice notice-error"><p>Server connection error</p></div>');
+                form.find('input[type="submit"]').prop('disabled', false);
+            }
+        });
+    });
+
+
     $('#photo_profile').on('change', function () {
         const file = this.files[0];
         if (file) {

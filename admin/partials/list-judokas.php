@@ -10,8 +10,9 @@ $judokas = $judoka_model->get_judokas();
 ?>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline">List of Judokas</h1>
-    <a href="?page=add-judoka" class="page-title-action">Add a new Judoka</a>
+    <h1 class="wp-heading-inline">List of Judokas</h1> &nbsp;
+    <a href="?page=add-judoka" class="page-title-action">Add a new Judoka</a> &nbsp; &nbsp;
+    <a href="?page=import-judokas" class="page-title-action">Import data</a>
 
     <?php if (!empty($_GET['message'])): ?>
         <div class="notice notice-success">

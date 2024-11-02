@@ -22,11 +22,11 @@ return array(
             'capability' => 'manage_options',
             'menu_slug' => 'edit-judoka'
         ),
-        'delete_judoka' => array(
-            'page_title' => 'Delete a Judoka',
-            'menu_title' => 'Delete a Judoka',
+        'import_judokas' => array(
+            'page_title' => 'Import Judokas',
+            'menu_title' => 'Import Judokas',
             'capability' => 'manage_options',
-            'menu_slug' => 'delete-judoka'
+            'menu_slug' => 'import-judokas',
         ),
     ),
 );
