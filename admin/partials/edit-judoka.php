@@ -157,7 +157,7 @@ $competitions = $competition_model->get_by_judoka($judoka_id);
             Add another competition
         </button>
 
-        <?php submit_button('Update the Judoka'); ?>
+<?php submit_button('Update the judoka'); ?>
     </form>
 </div>
 
