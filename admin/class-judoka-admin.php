@@ -103,7 +103,15 @@ class Judoka_Admin
             return;
         }
 
-        if ($this->judoka_model->judoka_exists($_POST['full_name'], $_POST['birth_date'])) {
+        $full_name  = filter_input(INPUT_POST,'full_name', FILTER_SANITIZE_STRING);
+        $birth_date = filter_input(INPUT_POST,'birth_date', FILTER_SANITIZE_STRING);
+
+        if (!$full_name || !$birth_date) {
+            wp_send_json_error('Invalid input data');
+            return;
+        }
+
+        if ($this->judoka_model->judoka_exists($full_name, $birth_date)) {
             wp_send_json_error('This judoka already exists!');
         }
 
