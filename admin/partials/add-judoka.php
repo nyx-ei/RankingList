@@ -118,23 +118,23 @@ if (!defined('ABSPATH')) {
         </div>
         <button type="button" id="add-competition" class="button">Add another competition</button>
 
-        <?php submit_button('Add the Judoka'); ?>
+        <?php submit_button('Add the judoka'); ?>
     </form>
 </div>
 
 <script>
-function normalizeText(text) {
-    return text.trim().toUpperCase();
-}
+    function normalizeText(text) {
+        return text.trim().toUpperCase();
+    }
 
-function updateFullName() {
-    const firstName = document.getElementById("first_name").value;
-    const lastName = document.getElementById("last_name").value;
+    function updateFullName() {
+        const firstName = document.getElementById("first_name").value;
+        const lastName = document.getElementById("last_name").value;
 
-    const fullName = `${normalizeText(firstName)} ${normalizeText(lastName)}`;
-    document.getElementById("full_name").value = fullName;
-}
+        const fullName = `${normalizeText(firstName)} ${normalizeText(lastName)}`;
+        document.getElementById("full_name").value = fullName;
+    }
 
-document.getElementById("first_name").addEventListener("input", updateFullName);
-document.getElementById("last_name").addEventListener("input", updateFullName);
+    document.getElementById("first_name").addEventListener("input", updateFullName);
+    document.getElementById("last_name").addEventListener("input", updateFullName);
 </script>
