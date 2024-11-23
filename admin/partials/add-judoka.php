@@ -118,7 +118,7 @@ if (!defined('ABSPATH')) {
         </div>
         <button type="button" id="add-competition" class="button">Add another competition</button>
 
-        <?php submit_button('Add the Judoka'); ?>
+        <?php submit_button('Add the judoka'); ?>
     </form>
 </div>
 
