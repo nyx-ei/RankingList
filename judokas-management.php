@@ -7,6 +7,8 @@
  * Author: NYX-EI <contact@nxy-ei.com>
  * License: GPLv3
  * Author URI: https://nxy-ei.com
+ * Requires at least: 6.0
+ * Requires PHP: 8.0
  */
 
 if (!defined('ABSPATH')) {

@@ -44,11 +44,5 @@ class Judoka_Activator
         dbDelta($sql_competitions);
     }
 
-    public static function deactivate()
-    {
-        global $wpdb;
-        $table_judokas = $wpdb->prefix . 'judokas';
-        $table_competitions = $wpdb->prefix . 'competitions_judoka';
-        $wpdb->query("DROP TABLE IF EXISTS $table_judokas, $table_competitions");
-    }
+    public static function deactivate(){}
 }

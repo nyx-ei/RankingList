@@ -16,5 +16,17 @@ return array(
             'capability' => 'manage_options',
             'menu_slug' => 'add-judoka'
         ),
+        'edit_judoka' => array(
+            'page_title' => 'Edit a Judoka',
+            'menu_title' => 'Edit a Judoka',
+            'capability' => 'manage_options',
+            'menu_slug' => 'edit-judoka'
+        ),
+        'import_judokas' => array(
+            'page_title' => 'Import Judokas',
+            'menu_title' => 'Import Judokas',
+            'capability' => 'manage_options',
+            'menu_slug' => 'import-judokas',
+        ),
     ),
 );

@@ -10,8 +10,9 @@ $judokas = $judoka_model->get_judokas();
 ?>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline">List of Judokas</h1>
-    <a href="?page=add-judoka" class="page-title-action">Add a new Judoka</a>
+    <h1 class="wp-heading-inline">List of Judokas</h1> &nbsp;
+    <a href="?page=add-judoka" class="page-title-action">Add a new Judoka</a> &nbsp; &nbsp;
+    <a href="?page=import-judokas" class="page-title-action">Import data</a>
 
     <?php if (!empty($_GET['message'])): ?>
         <div class="notice notice-success">
@@ -75,7 +76,7 @@ $judokas = $judoka_model->get_judokas();
                     <td>
                         <?php if (!empty($judoka->photo_profile)): ?>
                             <img src="<?php echo esc_url($judoka->photo_profile); ?>"
-                                 alt="Photo de <?php echo esc_attr($judoka->nom_complet); ?>"
+                                 alt="Photo de <?php echo esc_attr($judoka->full_name); ?>"
                                  style="width: 50px; height: 50px; object-fit: cover;">
                         <?php endif; ?>
                     </td>
@@ -100,8 +101,6 @@ $judokas = $judoka_model->get_judokas();
                                 data-name="<?php echo esc_attr($judoka->full_name); ?>">
                             Delete
                         </button>
-                        <a href="?page=view-judoka&id=<?php echo $judoka->id; ?>"
-                           class="button button-small">Details</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -122,25 +121,6 @@ jQuery(document).ready(function($) {
 
             $row.toggle(showCategory && showClub);
         });
-    });
-
-    $('.delete-judoka').on('click', function() {
-        const id = $(this).data('id');
-        const name = $(this).data('name');
-
-        if (confirm(`Are you sure you want to delete ${name}?`)) {
-            $.post(ajaxurl, {
-                action: 'delete_judoka',
-                id: id,
-                nonce: '<?php echo wp_create_nonce('delete_judoka_nonce'); ?>'
-            }, function(response) {
-                if (response.success) {
-                    location.reload();
-                } else {
-                    alert('Error during deletion');
-                }
-            });
-        }
     });
 });
 </script>
