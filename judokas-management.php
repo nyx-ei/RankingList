@@ -25,6 +25,12 @@ require_once JUDOKA_PLUGIN_DIR . 'includes/class-judoka-activator.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/class-judoka-model.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/class-competition-model.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-admin.php';
+require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka.php';
+require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-asset-handler.php';
+require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-menu-handler.php';
+require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-file-handler.php';
+require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-import-handler.php';
+require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-crud-handler.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/config/admin-menu.php';
 
 //enable and disable
