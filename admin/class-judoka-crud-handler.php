@@ -31,7 +31,7 @@ class Judoka_CRUD_Handler
         $judoka_id = $this->judoka_model->create_judoka($judoka_data);
 
         if ($judoka_id) {
-            $this->handle_competitions($judoka_id);
+            $this->updateOrCreateCompetitions($judoka_id);
             wp_send_json_success('Judoka successfully added');
         } else {
             wp_send_json_error('Error adding judoka');
@@ -50,7 +50,7 @@ class Judoka_CRUD_Handler
         $judoka_update = $this->judoka_model->update_judoka($judoka_id, $judoka_data);
 
         if ($judoka_update !== false) {
-            $this->handle_competitions($judoka_id);
+            $this->updateOrCreateCompetitions($judoka_id);
             wp_send_json_success('Judoka successfully updated');
         } else {
             wp_send_json_error('Error updating judoka');
@@ -74,7 +74,7 @@ class Judoka_CRUD_Handler
         }
     }
 
-    private function handle_competitions($judoka_id)
+    private function updateOrCreateCompetitions($judoka_id)
     {
         if (isset($_POST['competitions']) && is_array($_POST['competitions'])) {
             foreach ($_POST['competitions'] as $competition) {

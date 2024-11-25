@@ -90,7 +90,7 @@ class Judoka_Import_Handler {
 
     private function prepare_judoka_data($data, $column_indexes) {
         return [
-            'full_name' => trim($data[$column_indexes['full_name']]),
+            'full_name' => Judoka::formatFullName(trim($data[$column_indexes['full_name']])),
             'birth_date' => trim($data[$column_indexes['birth_date']]),
             'category' => trim($data[$column_indexes['category']]),
             'weight' => floatval(trim($data[$column_indexes['weight']])),
