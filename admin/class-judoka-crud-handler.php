@@ -10,8 +10,9 @@ class Judoka_CRUD_Handler
 
     public function __construct()
     {
-        $this->judoka_model = new Judoka_Model();
-        $this->competition_model = new Competition_Model();
+        $db = new Database_Access();
+        $this->judoka_model = new Judoka_Model($db);
+        $this->competition_model = new Competition_Model($db);
         $this->file_handler = new Judoka_File_Handler();
     }
 

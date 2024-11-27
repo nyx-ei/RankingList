@@ -2,13 +2,13 @@
 
 class Judoka_Model {
 
-    private $wpdb;
+    private $db;
     private $table_name;
 
-    public function __construct()
+    public function __construct(Database_Access $db)
     {
         global $wpdb;
-        $this->wpdb = $wpdb;
+        $this->db = $db;
         $this->table_name = $wpdb->prefix . 'judokas';
     }
 
@@ -42,7 +42,7 @@ class Judoka_Model {
             'images' => !empty($data['images']) ? json_encode($data['images']) : ''
         ];
 
-        return $this->wpdb->insert($this->table_name, $fields);
+        return $this->db->insert($this->table_name, $fields);
     }
 
 
@@ -53,8 +53,10 @@ class Judoka_Model {
      * @return object|false The retrieved judoka object on success, false if not found.
      */
     public function get_judoka($id) {
-        $query = $this->wpdb->prepare("SELECT * FROM $this->table_name WHERE id = %d", $id);
-        return $this->wpdb->get_row($query);
+        return $this->db->get_row(
+            "SELECT * FROM $this->table_name WHERE id = %d",
+            [$id]
+        );
     }
 
     /**
@@ -63,8 +65,9 @@ class Judoka_Model {
      * @return array List of all judokas.
      */
     public function get_judokas() {
-        $query = "SELECT * FROM $this->table_name ORDER BY full_name ASC";
-        return $this->wpdb->get_results($query);
+        return $this->db->get_results(
+            "SELECT * FROM $this->table_name ORDER BY full_name ASC"
+        );
     }
 
     /**
@@ -74,7 +77,7 @@ class Judoka_Model {
      */
     public function get_distinct_categories() {
         $query = "SELECT DISTINCT category FROM $this->table_name ORDER BY category ASC";
-        return $this->wpdb->get_col($query);
+        return $this->db->get_col($query);
     }
 
     /**
@@ -84,7 +87,7 @@ class Judoka_Model {
      */
     public function get_distinct_clubs() {
         $query = "SELECT DISTINCT club FROM $this->table_name ORDER BY club ASC";
-        return $this->wpdb->get_col($query);
+        return $this->db->get_col($query);
     }
 
     /**
@@ -108,7 +111,7 @@ class Judoka_Model {
             'images' => isset($data['images']) ? sanitize_text_field($data['images']) : ''
         ];
 
-        return $this->wpdb->update($this->table_name, $fields, ['id' => $id]);
+        return $this->db->update($this->table_name, $fields, ['id' => $id]);
     }
 
     /**
@@ -118,7 +121,7 @@ class Judoka_Model {
      * @return int|false The number of rows deleted, or false on error.
      */
     public function delete_judoka($id) {
-        return $this->wpdb->delete($this->table_name, ['id' => $id]);
+        return $this->db->delete($this->table_name, ['id' => $id]);
     }
 
     /**
@@ -130,12 +133,9 @@ class Judoka_Model {
      * @return int|false The ID of the judoka if it exists, false otherwise.
      */
     public function judoka_exists($full_name, $birth_date) {
-        return $this->wpdb->get_var(
-            $this->wpdb->prepare(
-                "SELECT id FROM {$this->table_name} WHERE full_name = %s AND birth_date = %s",
-                $full_name,
-                $birth_date
-            )
+        return $this->db->get_var(
+            "SELECT id FROM $this->table_name WHERE full_name = %s AND birth_date = %s",
+            [$full_name, $birth_date]
         );
     }
 }

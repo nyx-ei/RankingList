@@ -18,7 +18,7 @@ return array(
         ),
         'edit_judoka' => array(
             'page_title' => 'Edit a Judoka',
-            'menu_title' => 'Edit a Judoka',
+            'menu_title' => '',
             'capability' => 'manage_options',
             'menu_slug' => 'edit-judoka'
         ),

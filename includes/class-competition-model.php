@@ -1,11 +1,11 @@
 <?php
 class Competition_Model {
-    private $wpdb;
+    private $db;
     private $table_name;
 
-    public function __construct() {
+    public function __construct(Database_Access $db) {
         global $wpdb;
-        $this->wpdb = $wpdb;
+        $this->db = $db;
         $this->table_name = $wpdb->prefix . 'competitions_judoka';
     }
 
@@ -23,17 +23,16 @@ class Competition_Model {
      * @return int|false The number of rows inserted, or false on error.
      */
     public function create($data) {
-        return $this->wpdb->insert(
-            $this->table_name,
-            array(
-                'judoka_id' => intval($data['judoka_id']),
-                'competition_name' => sanitize_text_field($data['competition_name']),
-                'date_competition' => sanitize_text_field($data['date_competition']),
-                'points' => intval($data['points']),
-                'rang' => intval($data['rang']),
-                'medals' => sanitize_text_field($data['medals'])
-            )
-        );
+        $fields = [
+            'judoka_id' => intval($data['judoka_id']),
+            'competition_name' => sanitize_text_field($data['competition_name']),
+            'date_competition' => sanitize_text_field($data['date_competition']),
+            'points' => intval($data['points']),
+            'rang' => intval($data['rang']),
+            'medals' => sanitize_text_field($data['medals'])
+        ];
+
+        return $this->db->insert($this->table_name, $fields);
     }
 
     /**
@@ -44,11 +43,11 @@ class Competition_Model {
      * @return array An array of competition records, or an empty array if none are found.
      */
     public function get_by_judoka($judoka_id) {
-        return $this->wpdb->get_results(
-            $this->wpdb->prepare(
-                "SELECT * FROM {$this->table_name} WHERE judoka_id = %d ORDER BY date_competition DESC",
-                $judoka_id
-            )
+        return $this->db->get_results(
+            "SELECT * FROM {$this->table_name} 
+            WHERE judoka_id = %d 
+            ORDER BY date_competition DESC",
+            [$judoka_id]
         );
     }
 
@@ -66,17 +65,15 @@ class Competition_Model {
      * @return int|false The number of rows updated, or false on error.
      */
     public function update($id, $data) {
-        return $this->wpdb->update(
-            $this->table_name,
-            array(
-                'competition_name' => sanitize_text_field($data['competition_name']),
-                'date_competition' => sanitize_text_field($data['date_competition']),
-                'points' => intval($data['points']),
-                'rang' => intval($data['rang']),
-                'medals' => sanitize_text_field($data['medals'])
-            ),
-            array('id' => $id)
-        );
+        $fields = [
+            'competition_name' => sanitize_text_field($data['competition_name']),
+            'date_competition' => sanitize_text_field($data['date_competition']),
+            'points' => intval($data['points']),
+            'rang' => intval($data['rang']),
+            'medals' => sanitize_text_field($data['medals'])
+        ];
+
+        return $this->db->update($this->table_name, $fields, ['id' => $id]);
     }
 
     /**
@@ -87,7 +84,7 @@ class Competition_Model {
      * @return int|false The number of rows deleted, or false on error.
      */
     public function delete($id) {
-        return $this->wpdb->delete($this->table_name, array('id' => $id));
+        return $this->db->delete($this->table_name, ['id' => $id]);
     }
 
     /**
@@ -98,7 +95,7 @@ class Competition_Model {
      * @return int|false The number of rows deleted, or false on error.
      */
     public function delete_by_judoka($judoka_id) {
-        return $this->wpdb->delete($this->table_name, array('judoka_id' => $judoka_id));
+        return $this->db->delete($this->table_name, ['judoka_id' => $judoka_id]);
     }
 
     /**
@@ -109,11 +106,10 @@ class Competition_Model {
      * @return int The total points earned.
      */
     public function get_total_points($judoka_id) {
-        return $this->wpdb->get_var(
-            $this->wpdb->prepare(
-                "SELECT SUM(points) FROM {$this->table_name} WHERE judoka_id = %d",
-                $judoka_id
-            )
+        return $this->db->get_var(
+            "SELECT SUM(points) FROM {$this->table_name} 
+            WHERE judoka_id = %d",
+            [$judoka_id]
         );
     }
 
@@ -126,14 +122,12 @@ class Competition_Model {
      *               or an empty array if no medals are found.
      */
     public function get_medals_count($judoka_id) {
-        return $this->wpdb->get_results(
-            $this->wpdb->prepare(
-                "SELECT medals, COUNT(*) as count
-                FROM {$this->table_name}
-                WHERE judoka_id = %d AND medals != ''
-                GROUP BY medals",
-                $judoka_id
-            )
+        return $this->db->get_results(
+            "SELECT medals, COUNT(*) as count
+            FROM {$this->table_name}
+            WHERE judoka_id = %d AND medals != ''
+            GROUP BY medals",
+            [$judoka_id]
         );
     }
 }

@@ -6,7 +6,8 @@ class Judoka_Import_Handler {
     private $judoka_model;
 
     public function __construct() {
-        $this->judoka_model = new Judoka_Model();
+        $db = new Database_Access();
+        $this->judoka_model = new Judoka_Model($db);
     }
 
     public function handle_import() {

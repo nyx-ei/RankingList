@@ -21,6 +21,8 @@ define('JUDOKA_PLUGIN_VERSION', '1.0.0');
 
 define('JUDOKA_ADMIN_MENU_CONFIG', include JUDOKA_PLUGIN_DIR . 'admin/config/admin-menu.php');
 
+require_once JUDOKA_PLUGIN_DIR . 'includes/db/class-database-manager.php';
+require_once JUDOKA_PLUGIN_DIR . 'includes/db/class-database-access.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/class-judoka-activator.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/class-judoka-model.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/class-competition-model.php';
