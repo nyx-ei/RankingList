@@ -1,11 +1,10 @@
 <?php
-class Competition_Model {
-    private $db;
+class Competition_Model extends Base_Model {
     private $table_name;
 
-    public function __construct(Database_Access $db) {
+    public function __construct() {
+        parent::__construct();
         global $wpdb;
-        $this->db = $db;
         $this->table_name = $wpdb->prefix . 'competitions_judoka';
     }
 

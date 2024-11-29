@@ -4,9 +4,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$db = new Database_Access();
-$judoka_model = new Judoka_Model($db);
-$competition_model = new Competition_Model($db);
+$judoka_model = new Judoka_Model();
+$competition_model = new Competition_Model();
 $judokas = $judoka_model->get_judokas();
 ?>
 
