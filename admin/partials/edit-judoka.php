@@ -4,6 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+
 $judoka_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $judoka_model = new Judoka_Model();
 $competition_model = new Competition_Model();
