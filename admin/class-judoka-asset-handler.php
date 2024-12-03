@@ -13,6 +13,8 @@ class Judoka_Asset_Handler {
             'judoka_edit_nonce' => wp_create_nonce('edit_judoka_nonce'),
             'judoka_delete_nonce' => wp_create_nonce('delete_judoka_nonce'),
             'judoka_import_nonce' => wp_create_nonce('import_judoka_nonce'),
+            'report_nonce' => wp_create_nonce('generate_report_nonce'),
+            'share_nonce' => wp_create_nonce('share_report_nonce'),
         ]);
     }
 }

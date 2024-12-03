@@ -21,6 +21,8 @@ define('JUDOKA_PLUGIN_VERSION', '1.0.0');
 
 define('JUDOKA_ADMIN_MENU_CONFIG', include JUDOKA_PLUGIN_DIR . 'admin/config/admin-menu.php');
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 require_once JUDOKA_PLUGIN_DIR . 'includes/db/class-database-manager.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/db/class-database-access.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/models/class-base-model.php';
@@ -34,6 +36,7 @@ require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-menu-handler.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-file-handler.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-import-handler.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-crud-handler.php';
+require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-report-handler.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/config/admin-menu.php';
 
 //enable and disable
