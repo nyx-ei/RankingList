@@ -28,5 +28,11 @@ return array(
             'capability' => 'manage_options',
             'menu_slug' => 'import-judokas',
         ),
+        'reports' => array(
+            'page_title' => 'Reports',
+            'menu_title' => 'Reports',
+            'capability' => 'manage_options',
+            'menu_slug' => 'judoka-reports',
+        ),
     ),
 );

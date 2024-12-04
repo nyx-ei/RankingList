@@ -38,6 +38,10 @@ class Judoka_Menu_Handler
         include JUDOKA_PLUGIN_DIR . 'admin/partials/import-judoka.php';
     }
 
+    public function display_reports() {
+        include JUDOKA_PLUGIN_DIR . 'admin/partials/reports.php';
+    }
+
     private function add_main_menu()
     {
         $menu = $this->config_menu['menu'];
@@ -57,7 +61,8 @@ class Judoka_Menu_Handler
         $submenus = [
             'add_judoka' => 'display_add_judoka',
             'edit_judoka' => 'display_edit_judoka',
-            'import_judokas' => 'display_import_judokas'
+            'import_judokas' => 'display_import_judokas',
+            'reports' => 'display_reports' 
         ];
 
         foreach ($submenus as $key => $callback) {
