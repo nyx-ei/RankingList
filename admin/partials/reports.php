@@ -1,5 +1,4 @@
 <?php
-// Ensure this file is being included by a parent file
 if (!defined('ABSPATH')) exit;
 
 $judoka_model = new Judoka_Model();
@@ -14,7 +13,7 @@ $clubs = $judoka_model->get_distinct_clubs();
         <p></p>
     </div>
 
-    <div class="card">
+    <div class="card card-form">
         <h2>Generate Report</h2>
         <form id="generate-report-form" class="report-form">
             <?php wp_nonce_field('generate_report_nonce', 'report_nonce'); ?>

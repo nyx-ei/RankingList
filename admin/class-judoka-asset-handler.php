@@ -5,7 +5,9 @@ if (!defined('ABSPATH')) exit;
 class Judoka_Asset_Handler {
     public function enqueue_admin_scripts() {
         wp_enqueue_style('judoka-admin-css', JUDOKA_PLUGIN_URL . 'admin/css/judoka-admin.css');
+        wp_enqueue_style('admin-reports-css', JUDOKA_PLUGIN_URL . 'admin/css/admin-reports.css');
         wp_enqueue_script('judoka-admin-js', JUDOKA_PLUGIN_URL . 'admin/js/judoka-admin.js', ['jquery']);
+        wp_enqueue_script('admin-reports-js', JUDOKA_PLUGIN_URL . 'admin/js/admin-reports.js', ['jquery']);
 
         wp_localize_script('judoka-admin-js', 'judokaAjax', [
             'ajaxurl' => admin_url('admin-ajax.php'),
