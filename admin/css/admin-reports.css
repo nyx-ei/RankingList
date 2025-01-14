@@ -9,10 +9,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* .card-form {
-    padding: 20px;
-} */
-
 /* Form styles */
 .report-form {
     padding: 20px;
@@ -52,13 +48,25 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    justify-content: flex-start; 
 }
 
 .button-group .button {
-    margin-right: 10px;
     display: inline-flex;
     align-items: center;
-    padding: 8px 16px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #f8f9fa;
+}
+
+.button-group .button:hover {
+    background-color: #e9ecef;
+    border-color: #ccc;
 }
 
 .button .dashicons {
@@ -135,10 +143,23 @@
     background-color: #fafafa;
 }
 
-/* Responsive adjustments */
+@media screen and (max-width: 1024px) {
+    .card-form {
+        width: 100%;
+    }
+
+    .modal-content {
+        width: 70%;
+    }
+}
+
 @media screen and (max-width: 782px) {
     .form-group {
         min-width: 100%;
+    }
+
+    .form-row {
+        gap: 15px;
     }
 
     .modal-content {
@@ -150,5 +171,58 @@
         width: 100%;
         margin-bottom: 10px;
         justify-content: center;
+    }
+
+    #report-content th,
+    #report-content td {
+        padding: 8px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .modal-content {
+        padding: 15px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 6px;
+        font-size: 14px;
+    }
+
+    .button-group .button {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .button-group {
+        justify-content: center; 
+    }
+}
+
+@media screen and (max-width: 782px) {
+    .button-group .button {
+        width: 100%; 
+        font-size: 14px; 
+        padding: 8px 16px;
+        margin-bottom: 10px; 
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .button-group {
+        gap: 5px; 
+    }
+
+    .button-group .button {
+        padding: 6px 12px;
+        font-size: 12px; 
     }
 }
