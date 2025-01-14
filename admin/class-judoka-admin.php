@@ -31,7 +31,7 @@ class Judoka_Admin
         add_action('wp_ajax_edit_judoka', [$this->judoka_handler, 'handle_edit']);
         add_action('wp_ajax_delete_judoka', [$this->judoka_handler, 'handle_delete']);
         add_action('wp_ajax_import_judokas', [$this->import_handler, 'handle_import']);
-        add_action('wp_ajax_generate_report', [$this->report_handler, 'handle_generate']);
+        add_action('wp_ajax_generate_report', [$this->report_handler, 'generate_report']);
         add_action('wp_ajax_share_report', [$this->report_handler, 'handle_share']);
     }
 }
