@@ -29,6 +29,7 @@ require_once JUDOKA_PLUGIN_DIR . 'includes/models/class-base-model.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/models/class-judoka-model.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/models/class-competition-model.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/class-judoka-activator.php';
+require_once JUDOKA_PLUGIN_DIR . 'includes/shortcodes/class-judoka-ranking-shortcode.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-admin.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-asset-handler.php';
