@@ -4,8 +4,12 @@ if (!defined('ABSPATH')) exit;
 
 class Judoka_File_Handler {
     public function handle_profile_photo($judoka_id = null) {
+        if (empty($_FILES['photo_profile']['name']) && !empty($_POST['old_photo_profile'])) {
+            return $_POST['old_photo_profile'];
+        }
+        
         $photo_url = '';
-        if (isset($_FILES['photo_profile'])) {
+        if (isset($_FILES['photo_profile']) && !empty($_FILES['photo_profile']['name'])) {
             $upload = wp_handle_upload($_FILES['photo_profile'], ['test_form' => false]);
             if (!isset($upload['error'])) {
                 $photo_url = $upload['url'];
@@ -15,6 +19,10 @@ class Judoka_File_Handler {
     }
 
     public function handle_gallery_images($judoka_id = null) {
+        if (empty($_FILES['images']['name'][0]) && !empty($_POST['old_images'])) {
+            return json_decode($_POST['old_images'], true);
+        }
+        
         $images_urls = [];
         if (isset($_FILES['images'])) {
             foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {

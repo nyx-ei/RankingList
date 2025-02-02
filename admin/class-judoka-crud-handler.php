@@ -98,9 +98,18 @@ class Judoka_CRUD_Handler
 
     private function prepare_judoka_data($judoka_id = null)
     {
-        $photo_url = $this->file_handler->handle_profile_photo($judoka_id);
-        $images_urls = $this->file_handler->handle_gallery_images($judoka_id);
-
+        if ($judoka_id && empty($_FILES['photo_profile']['name'])) {
+            $photo_url = $_POST['old_photo_profile'] ?? '';
+        } else {
+            $photo_url = $this->file_handler->handle_profile_photo($judoka_id);
+        }
+    
+        if ($judoka_id && empty($_FILES['images']['name'][0])) {
+            $images_urls = explode(',', $_POST['old_images'] ?? '');
+        } else {
+            $images_urls = $this->file_handler->handle_gallery_images($judoka_id);
+        }
+    
         return [
             'full_name' => $_POST['full_name'],
             'birth_date' => $_POST['birth_date'],

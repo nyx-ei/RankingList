@@ -29,8 +29,14 @@ if (!defined('ABSPATH')) {
                 <td><input type="date" id="birth_date" name="birth_date" required></td>
             </tr>
             <tr>
-                <th><label for="category">Category</label></th>
-                <td><input type="text" id="category" name="category" class="regular-text" required></td>
+            <th><label for="category">Category</label></th>
+                <td>
+                    <select id="category" name="category" required>
+                        <option value="">Select a category</option>
+                        <option value="Senior">Senior</option>
+                        <option value="Junior">Junior</option>
+                    </select>
+                </td>
             </tr>
             <tr>
                 <th><label for="weight">Weight (kg)</label></th>
