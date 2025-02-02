@@ -18,6 +18,8 @@ class Judoka_Ranking_Shortcode
 
         add_shortcode('judoka_ranking', array($this, 'render_ranking'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
+        add_action('wp_ajax_filter_judokas', array($this, 'ajax_filter_judokas'));
+        add_action('wp_ajax_nopriv_filter_judokas', array($this, 'ajax_filter_judokas'));
     }
 
     public function enqueue_assets()
@@ -46,33 +48,77 @@ class Judoka_Ranking_Shortcode
     public function render_ranking($atts)
     {
         $atts = shortcode_atts(array(
-            'category' => 'seniors',
+            'category' => 'all',
             'gender' => 'all',
-            'weight' => 'all'
+            'weight' => 'all',
+            'club' => 'all'
         ), $atts);
 
         ob_start();
-?>
+        ?>
         <div class="judoka-ranking-container">
-            <?php $this->render_filters($atts); ?>
-            <div class="ranking-table">
-                <?php
-                $this->render_table_header();
-                $this->render_table_body($atts);
-                ?>
+            <div class="ranking-sidebar">
+                <?php $this->render_sidebar_filters(); ?>
+            </div>
+            <div class="ranking-main">
+                <?php $this->render_top_filters($atts); ?>
+                <div class="ranking-table" data-view="simple">
+                    <?php
+                    $this->render_table_header();
+                    $this->render_table_body($atts);
+                    ?>
+                </div>
             </div>
         </div>
-    <?php
+        <?php
         return ob_get_clean();
     }
 
-    public function render_filters($atts)
+    private function render_sidebar_filters()
     {
-    ?>
+        ?>
+        <div class="weight-gender-filters">
+            <div class="gender-section">
+                <h3>Gender</h3>
+                <div class="gender-buttons">
+                    <button class="gender-btn active" data-gender="all">All</button>
+                    <button class="gender-btn" data-gender="M">M</button>
+                    <button class="gender-btn" data-gender="F">F</button>
+                </div>
+            </div>
+            
+            <div class="weight-section">
+                <h3>Weight Categories</h3>
+                <div class="weight-buttons">
+                    <?php
+                    $weights = [
+                        'M' => ['-60', '-66', '-73', '-81', '-90', '-100', '+100'],
+                        'F' => ['-48', '-52', '-57', '-63', '-70', '-78', '+78']
+                    ];
+                    
+                    foreach ($weights as $gender => $categories) {
+                        echo '<div class="weight-group" data-gender="' . esc_attr($gender) . '">';
+                        foreach ($categories as $weight) {
+                            echo '<button class="weight-btn" data-weight="' . esc_attr($weight) . '">' 
+                                . esc_html($weight) . '</button>';
+                        }
+                        echo '</div>';
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    private function render_top_filters($atts)
+    {
+        ?>
         <div class="ranking-filters">
             <select id="category-filter">
-                <option value="seniors" <?php selected($atts['category'], 'seniors'); ?>>Seniors</option>
-                <option value="juniors" <?php selected($atts['category'], 'juniors'); ?>>Juniors</option>
+                <option value="all" <?php selected($atts['category'], 'all'); ?>>All Categories</option>
+                <option value="senior" <?php selected($atts['category'], 'senior'); ?>>Senior</option>
+                <option value="junior" <?php selected($atts['category'], 'junior'); ?>>Junior</option>
             </select>
 
             <div class="view-toggle">
@@ -80,32 +126,33 @@ class Judoka_Ranking_Shortcode
                 <button class="view-btn" data-view="expanded">Expanded</button>
             </div>
 
-            <select id="nation-filter">
-                <option value="all">All</option>
+            <select id="club-filter">
+                <option value="all">All Clubs</option>
                 <?php
-                $nations = $this->get_all_nations();
-                foreach ($nations as $nation) {
-                    echo '<option value="' . esc_attr($nation) . '">' . esc_html($nation) . '</option>';
+                $clubs = $this->get_all_clubs();
+                foreach ($clubs as $club) {
+                    echo '<option value="' . esc_attr($club) . '">' . esc_html($club) . '</option>';
                 }
                 ?>
             </select>
 
             <input type="text" id="search-name" placeholder="Search by name">
         </div>
-    <?php
+        <?php
     }
 
     private function render_table_header()
     {
-    ?>
+        ?>
         <div class="ranking-header">
             <div class="col-place">Place</div>
             <div class="col-change">Ch.</div>
             <div class="col-competitor">Competitor</div>
             <div class="col-nation">Nation</div>
             <div class="col-points">Points</div>
+            <div class="col-details expanded-only">Details</div>
         </div>
-    <?php
+        <?php
     }
 
     private function render_table_body($atts)
@@ -129,28 +176,49 @@ class Judoka_Ranking_Shortcode
         $photo_url = !empty($judoka->photo_profile) ? $judoka->photo_profile : $this->default_picture;
         $previous_rank = $this->get_previous_rank($judoka->id);
         $rank_change = $previous_rank ? $previous_rank - $rank : 0;
-    ?>
-        <div class="ranking-row">
+        ?>
+        <div class="ranking-row" 
+             data-category="<?php echo esc_attr($judoka->category); ?>"
+             data-gender="<?php echo esc_attr($judoka->gender); ?>"
+             data-weight="<?php echo esc_attr($judoka->weight); ?>"
+             data-club="<?php echo esc_attr($judoka->club); ?>">
+            
             <div class="col-place">#<?php echo esc_html($rank); ?></div>
-            <div class="col-change">
-                <?php $this->render_rank_change($rank_change); ?>
-            </div>
+            <div class="col-change"><?php $this->render_rank_change($rank_change); ?></div>
             <div class="col-competitor">
-                <img src="<?php echo esc_url($photo_url); ?>"
-                    alt="<?php echo esc_attr($judoka->full_name); ?>"
-                    class="judoka-photo">
+                <img src="<?php echo esc_url($photo_url); ?>" 
+                     alt="<?php echo esc_attr($judoka->full_name); ?>" 
+                     class="judoka-photo">
                 <span class="judoka-name"><?php echo esc_html($judoka->full_name); ?></span>
             </div>
             <div class="col-nation">
-                <?php if (!empty($judoka->club)): ?>
-                    <span><?php echo esc_html($judoka->club); ?></span>
-                <?php endif; ?>
+                <img src="<?php echo esc_url($this->default_flag); ?>" 
+                     alt="Cameroon flag" 
+                     class="nation-flag">
+                <span><?php echo esc_html($judoka->club); ?></span>
             </div>
             <div class="col-points">
                 <?php echo number_format((float)$judoka->total_points); ?> points
             </div>
+            <div class="col-details expanded-only">
+                <div class="details-content">
+                    <p>Weight: <?php echo esc_html($judoka->weight); ?></p>
+                    <p>Category: <?php echo esc_html($judoka->category); ?></p>
+                    <?php
+                    $competitions = $this->competition_model->get_by_judoka($judoka->id);
+                    if (!empty($competitions)) {
+                        echo '<p>Recent competitions:</p><ul>';
+                        foreach (array_slice($competitions, 0, 3) as $comp) {
+                            echo '<li>' . esc_html($comp->competition_name) . ' - ' 
+                                . esc_html($comp->points) . ' points</li>';
+                        }
+                        echo '</ul>';
+                    }
+                    ?>
+                </div>
+            </div>
         </div>
-<?php
+        <?php
     }
 
     private function render_rank_change($change)
@@ -168,21 +236,37 @@ class Judoka_Ranking_Shortcode
     {
         global $wpdb;
 
+        $where_clauses = array('1=1');
+        $where_values = array();
+
+        if ($filters['category'] !== 'all') {
+            $where_clauses[] = 'j.category = %s';
+            $where_values[] = $filters['category'];
+        }
+
+        if ($filters['gender'] !== 'all') {
+            $where_clauses[] = 'j.gender = %s';
+            $where_values[] = $filters['gender'];
+        }
+
+        if ($filters['weight'] !== 'all') {
+            $where_clauses[] = 'j.weight = %s';
+            $where_values[] = $filters['weight'];
+        }
+
+        if ($filters['club'] !== 'all') {
+            $where_clauses[] = 'j.club = %s';
+            $where_values[] = $filters['club'];
+        }
+
         $query = $wpdb->prepare(
-            "SELECT j.*, 
-                    COALESCE(SUM(c.points), 0) as total_points
+            "SELECT j.*, COALESCE(SUM(c.points), 0) as total_points
              FROM {$wpdb->prefix}judokas j
              LEFT JOIN {$wpdb->prefix}competitions_judoka c ON j.id = c.judoka_id
-             WHERE j.category = %s
-             AND (j.gender = %s OR %s = 'all')
-             AND (j.weight = %s OR %s = 'all')
+             WHERE " . implode(' AND ', $where_clauses) . "
              GROUP BY j.id
              ORDER BY total_points DESC",
-            $filters['category'],
-            $filters['gender'],
-            $filters['gender'],
-            $filters['weight'],
-            $filters['weight']
+            ...$where_values
         );
 
         $results = $wpdb->get_results($query);
@@ -195,17 +279,39 @@ class Judoka_Ranking_Shortcode
         return $results;
     }
 
-    private function get_previous_rank($judoka_id)
-    {
-        //TODO : get previous rank
-        return null;
-    }
-
-    private function get_all_nations()
+    private function get_all_clubs()
     {
         global $wpdb;
         $query = "SELECT DISTINCT club FROM {$wpdb->prefix}judokas WHERE club != '' ORDER BY club";
         return $wpdb->get_col($query);
+    }
+
+    private function get_previous_rank($judoka_id)
+    {
+        // TODO: implement this function to get the previous rank
+        return null;
+    }
+
+    public function ajax_filter_judokas()
+    {
+        check_ajax_referer('judoka_ranking_nonce', 'nonce');
+
+        $filters = array(
+            'category' => sanitize_text_field($_POST['category'] ?? 'all'),
+            'gender' => sanitize_text_field($_POST['gender'] ?? 'all'),
+            'weight' => sanitize_text_field($_POST['weight'] ?? 'all'),
+            'club' => sanitize_text_field($_POST['club'] ?? 'all')
+        );
+
+        $judokas = $this->get_ranked_judokas($filters);
+        
+        ob_start();
+        foreach ($judokas as $rank => $judoka) {
+            $this->render_judoka_row($judoka, $rank + 1);
+        }
+        $html = ob_get_clean();
+
+        wp_send_json_success(['html' => $html]);
     }
 }
 
