@@ -63,6 +63,30 @@ class Database_Manager {
         }
     }
 
+    public function createRankingsHistoryTable()
+    {
+        try {
+        $table_name = $this->wpdb->prefix. 'rankings_history';
+        $judokas_table = $this->wpdb->prefix. 'judokas';
+
+            $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+                id mediumint(9) NOT NULL AUTO_INCREMENT,
+                judoka_id mediumint(9) NOT NULL,
+                rank int NOT NULL,
+                total_points int NOT NULL,
+                snapshot_date date NOT NULL,
+                created_at datetime DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                FOREIGN KEY (judoka_id) REFERENCES $judokas_table(id),
+                KEY idx_snapshot_date (snapshot_date)
+            ) $this->charset_collate;";
+
+            return $this->executeQuery($sql);
+        } catch (\Throwable $e) {
+            return new WP_Error('database_error', $e->getMessage());
+        }
+    }
+
 
     private function executeQuery($sql) {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

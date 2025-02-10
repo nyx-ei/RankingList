@@ -29,6 +29,7 @@ require_once JUDOKA_PLUGIN_DIR . 'includes/models/class-base-model.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/models/class-judoka-model.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/models/class-competition-model.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/class-judoka-activator.php';
+require_once  JUDOKA_PLUGIN_DIR . 'includes/class-judoka-cron-manager.php';
 require_once JUDOKA_PLUGIN_DIR . 'includes/shortcodes/class-judoka-ranking-shortcode.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-admin.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka.php';
@@ -40,10 +41,21 @@ require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-crud-handler.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/class-judoka-report-handler.php';
 require_once JUDOKA_PLUGIN_DIR . 'admin/config/admin-menu.php';
 
-//enable and disable
-register_activation_hook(__FILE__, array('Judoka_Activator', 'activate'));
-register_deactivation_hook(__FILE__, array('Judoka_Activator', 'deactivate'));
+// Plugin activation
+register_activation_hook(__FILE__, function() {
+    Judoka_Activator::activate();
 
+    $cron_manager = Judoka_Cron_Manager::get_instance();
+    $cron_manager->setup_cron();
+});
+
+// Plugin deactivation
+register_deactivation_hook(__FILE__, function() {
+    Judoka_Activator::deactivate();
+
+    $cron_manager = Judoka_Cron_Manager::get_instance();
+    $cron_manager->remove_cron();
+});
 
 if (is_admin()) {
     $judoka_admin = new Judoka_Admin();

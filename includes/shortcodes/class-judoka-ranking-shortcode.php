@@ -288,8 +288,67 @@ class Judoka_Ranking_Shortcode
 
     private function get_previous_rank($judoka_id)
     {
-        // TODO: implement this function to get the previous rank
-        return null;
+        global $wpdb;
+
+        $latest_snapshot = $wpdb->get_var($wpdb->prepare(
+            "SELECT MAX(snapshot_date) 
+            FROM {$wpdb->prefix}rankings_history 
+            WHERE snapshot_date < CURDATE()"
+        ));
+
+        if (!$latest_snapshot) {
+            return null;
+        }
+
+        $query = $wpdb->get_var($wpdb->prepare(
+            "SELECT rank 
+            FROM {$wpdb->prefix}rankings_history 
+            WHERE judoka_id = %d 
+            AND snapshot_date = %s",
+            $judoka_id,
+            $latest_snapshot
+        ));
+    }
+
+    public function store_current_rankings()
+    {
+        global $wpdb;
+
+        $date = 'Y-m-d ';
+
+        $current_date = current_time($date);
+
+        $existing_snapshot = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) 
+            FROM {$wpdb->prefix}rankings_history 
+            WHERE snapshot_date = %s",
+            $current_date
+        ));
+
+        if ($existing_snapshot > 0)
+        {
+            return;
+        }
+
+        $current_rankings = $this->get_ranked_judokas([
+            'category' => 'all',
+            'gender' => 'all',
+            'weight' => 'all',
+            'club' => 'all'
+        ]);
+
+        foreach ($current_rankings as $rank => $judoka) {
+            $wpdb->insert(
+                $wpdb->prefix . 'rankings_history',
+                [
+                    'judoka_id' => $judoka->id,
+                    'rank' => $rank + 1,
+                    'total_points' => $judoka->total_points,
+                    'snapshot_date' => $current_date
+                ],
+                ['%d', '%d', '%d', '%s']
+            );
+        }
     }
 
     public function ajax_filter_judokas()
