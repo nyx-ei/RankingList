@@ -10,6 +10,7 @@ class Judoka_Activator
         $database_manager = new Database_Manager();
         $database_manager->createJudokasTable();
         $database_manager->createCompetitionsTable();
+        $database_manager->createRankingsHistoryTable();
     }
 
     public static function deactivate(){}

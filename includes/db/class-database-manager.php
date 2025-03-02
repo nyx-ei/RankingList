@@ -66,13 +66,13 @@ class Database_Manager {
     public function createRankingsHistoryTable()
     {
         try {
-        $table_name = $this->wpdb->prefix. 'rankings_history';
-        $judokas_table = $this->wpdb->prefix. 'judokas';
+        $table_name = $this->wpdb->prefix . 'rankings_history';
+        $judokas_table = $this->wpdb->prefix . 'judokas';
 
             $sql = "CREATE TABLE IF NOT EXISTS $table_name (
                 id mediumint(9) NOT NULL AUTO_INCREMENT,
                 judoka_id mediumint(9) NOT NULL,
-                rank int NOT NULL,
+                `rank` int NOT NULL,
                 total_points int NOT NULL,
                 snapshot_date date NOT NULL,
                 created_at datetime DEFAULT CURRENT_TIMESTAMP,
