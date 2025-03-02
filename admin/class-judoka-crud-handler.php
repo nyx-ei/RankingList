@@ -98,6 +98,11 @@ class Judoka_CRUD_Handler
 
     private function prepare_judoka_data($judoka_id = null)
     {
+        if (isset($_POST['first_name']) && isset($_POST['last_name'])) {
+            $first_name = trim(strtoupper($_POST['first_name']));
+            $last_name = trim(strtoupper($_POST['last_name']));
+            $_POST['full_name'] = $first_name . ' ' . $last_name;
+        }
         if ($judoka_id && empty($_FILES['photo_profile']['name'])) {
             $photo_url = $_POST['old_photo_profile'] ?? '';
         } else {
