@@ -98,8 +98,13 @@ class Judoka_CRUD_Handler
 
     private function prepare_judoka_data($judoka_id = null)
     {
-        $photo_url = $this->file_handler->handle_profile_photo($judoka_id);
-        $images_urls = $this->file_handler->handle_gallery_images($judoka_id);
+        if (isset($_POST['first_name']) && isset($_POST['last_name'])) {
+            $first_name = trim(strtoupper($_POST['first_name']));
+            $last_name = trim(strtoupper($_POST['last_name']));
+            $_POST['full_name'] = $first_name . ' ' . $last_name;
+        }
+
+        $images_data = $this->images($judoka_id);
 
         return [
             'full_name' => $_POST['full_name'],
@@ -109,8 +114,25 @@ class Judoka_CRUD_Handler
             'club' => $_POST['club'],
             'grade' => $_POST['grade'],
             'gender' => $_POST['gender'],
+            'photo_profile' => $images_data['photo_profile'],
+            'images' => json_encode($images_data['images'])
+        ];
+    }
+    private function images($judoka_id) {
+        if ($judoka_id && empty($_FILES['photo_profile']['name'])) {
+            $photo_url = $_POST['old_photo_profile'] ?? '';
+        } else {
+            $photo_url = $this->file_handler->get_profile_photo($judoka_id);
+        }
+
+        if ($judoka_id && empty($_FILES['images']['name'][0])) {
+            $images_urls = explode(',', $_POST['old_images'] ?? '');
+        } else {
+            $images_urls = $this->file_handler->get_gallery_images($judoka_id);
+        }
+        return [
             'photo_profile' => $photo_url,
-            'images' => json_encode($images_urls)
+            'images' => $images_urls,
         ];
     }
 

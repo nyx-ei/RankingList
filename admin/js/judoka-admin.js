@@ -1,8 +1,65 @@
 jQuery(document).ready(function ($) {
-    let competitionCount = 0;
+    let competitionCount = $('.competition-entry').length;
 
+    function updateFullName() {
+        const firstName = $('#first_name').val().trim().toUpperCase();
+        const lastName = $('#last_name').val().trim().toUpperCase();
+        $('#full_name').val(`${firstName} ${lastName}`);
+    }
+
+    updateFullName();
+
+    $('#first_name, #last_name').on('input', function() {
+        updateFullName();
+    });
+
+    $('.judoka-form').on('submit', function (e) {
+        e.preventDefault();
+
+        updateFullName();
+
+        const form = $(this);
+        const formData = new FormData(this);
+        const isEdit = form.attr('id') === 'form-edit-judoka';
+
+        formData.append('action', isEdit ? 'edit_judoka' : 'add_judoka');
+        formData.append(
+            isEdit ? 'judoka_edit_nonce' : 'judoka_nonce',
+            isEdit ? judokaAjax.judoka_edit_nonce : judokaAjax.judoka_nonce
+        );
+
+        form.find('input[type="submit"]').prop('disabled', true);
+        form.find('.notice').remove();
+        form.append('<div class="notice notice-info"><p>Sending...</p></div>');
+
+        $.ajax({
+            url: judokaAjax.ajaxurl,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                form.find('.notice').remove();
+                if (response.success) {
+                    form.append(`<div class="notice notice-success"><p>Judoka successfully ${isEdit ? 'updated' : 'added'}!</p></div>`);
+                    setTimeout(function () {
+                        window.location.href = 'admin.php?page=judokas-management';
+                    }, 2000);
+                } else {
+                    form.append(`<div class="notice notice-error"><p>Error: ${response.data}</p></div>`);
+                    form.find('input[type="submit"]').prop('disabled', false);
+                }
+            },
+            error: function () {
+                form.find('.notice').remove();
+                form.append('<div class="notice notice-error"><p>Server connection error</p></div>');
+                form.find('input[type="submit"]').prop('disabled', false);
+            }
+        });
+    });
+
+    //Competitions
     $('#add-competition').on('click', function () {
-        competitionCount++;
         const template = `
             <table class="form-table competition-entry">
                 <tr>
@@ -24,7 +81,7 @@ jQuery(document).ready(function ($) {
                     <td><input type="number" name="competitions[${competitionCount}][points]" min="0"></td>
                 </tr>
                 <tr>
-                    <th><label>Rang</label></th>
+                    <th><label>Rank</label></th>
                     <td><input type="number" name="competitions[${competitionCount}][rang]" min="1"></td>
                 </tr>
                 <tr>
@@ -41,92 +98,65 @@ jQuery(document).ready(function ($) {
             </table>
         `;
         $('#competitions-container').append(template);
+        competitionCount++;
     });
 
+    // delete of competition
     $(document).on('click', '.remove-competition', function () {
         $(this).closest('.competition-entry').remove();
     });
 
-    //add new judoka
-    $('#form-judoka').on('submit', function (e) {
-        e.preventDefault();
-        const form = $(this);
-        const formData = new FormData(this);
+    // $('#first_name, #last_name').on('input', updateFullName);
 
-        formData.append('action', 'add_judoka');
-        formData.append('judoka_nonce', judokaAjax.judoka_nonce);
+    // Preview profile image
+    function handleImagePreview(input, previewClass) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = $('<img>').attr({
+                    src: e.target.result,
+                    class: previewClass,
+                    style: 'max-width: 150px; margin: 5px;'
+                });
 
-        form.find('input[type="submit"]').prop('disabled', false);
-        form.append('<div class="notice notice-info"><p>Sending...</p></div>');
+                $(`.${previewClass}`).remove();
+                $(input).after(preview);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
 
-        $.ajax({
-            url: judokaAjax.ajaxurl,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                form.find('.notice').remove();
-                if (response.success) {
-                    form.append('<div class="notice notice-success"><p>Judoka successfully added!</p></div>');
-                    setTimeout(function () {
-                        window.location.href = 'admin.php?page=judokas-management';
-                    }, 2000);
-                } else {
-                    form.append(`<div class="notice notice-error"><p>Error: ${response.data}</p></div>`);
-                    form.find('input[type="submit"]').prop('disabled', false);
-                }
-            },
-            error: function () {
-                form.find('.notice').remove();
-                form.append('<div class="notice notice-error"><p>Server connection error</p></div>');
-                form.find('input[type="submit"]').prop('disabled', true);
-            }
-        });
+    $('#photo_profile').on('change', function() {
+        handleImagePreview(this, 'photo-preview');
     });
 
-    //edit judoka
-    $('#form-edit-judoka').on('submit', function (e) {
-        e.preventDefault();
-        const form = $(this);
-        const formData = new FormData(this);
+    // Preview images
+    $('#images').on('change', function() {
+        const files = this.files;
+        const previewContainer = $('<div>').addClass('images-preview');
 
-        formData.append('action', 'edit_judoka');
-        formData.append('judoka_edit_nonce', judokaAjax.judoka_edit_nonce);
+        $(this).siblings('.images-preview').remove();
 
-        form.find('input[type="submit"]').prop('disabled', false);
-        form.append('<div class="notice notice-info"><p>Sending...</p></div>');
-
-        $.ajax({
-            url: judokaAjax.ajaxurl,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                form.find('.notice').remove();
-                if (response.success) {
-                    form.append('<div class="notice notice-success"><p>Judoka successfully updated!</p></div>');
-                    setTimeout(function () {
-                        window.location.href = 'admin.php?page=judokas-management';
-                    }, 2000);
-                } else {
-                    form.append(`<div class="notice notice-error"><p>Error: ${response.data}</p></div>`);
-                    form.find('input[type="submit"]').prop('disabled', false);
-                }
-            },
-            error: function () {
-                form.find('.notice').remove();
-                form.append('<div class="notice notice-error"><p>Server connection error</p></div>');
-                form.find('input[type="submit"]').prop('disabled', true);
+        if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = $('<img>').attr({
+                        src: e.target.result,
+                        style: 'max-width: 150px; margin: 5px;'
+                    });
+                    previewContainer.append(preview);
+                };
+                reader.readAsDataURL(files[i]);
             }
-        });
+            $(this).after(previewContainer);
+        }
     });
 
-    //delete judoka
+    // Delete judoka
     $('.delete-judoka').on('click', function(e) {
         e.preventDefault();
-
         const button = $(this);
         const id = button.data('id');
         const name = button.data('name');
@@ -145,8 +175,6 @@ jQuery(document).ready(function ($) {
                     button.prop('disabled', true).text('Deleting...');
                 },
                 success: function(response) {
-                    console.log(response);
-                    window.location.href = 'admin.php?page=judokas-management';
                     if (response.success) {
                         row.fadeOut(500, function() {
                             $(this).remove();
@@ -170,61 +198,5 @@ jQuery(document).ready(function ($) {
         }
     });
 
-    //import data
-    $('#form-import-judoka').on('submit', function (e) {
-        e.preventDefault();
-
-        const form = $(this);
-        const formData = new FormData(this);
-
-        formData.append('action', 'import_judokas');
-        formData.append('judoka_import_nonce', judokaAjax.judoka_import_nonce);
-
-        form.find('input[type="submit"]').prop('disabled', true);
-        form.append('<div class="notice notice-info"><p>Importing...</p></div>');
-
-        $.ajax({
-            url: judokaAjax.ajaxurl,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                form.find('.notice').remove();
-                form.find('input[type="submit"]').prop('disabled', false);
-
-                if (response.success) {
-                    form.append(`<div class="notice notice-success"><p>${response.data.message}</p></div>`);
-                    setTimeout(function () {
-                        window.location.href = 'admin.php?page=judokas-management&import=success&count=' + response.data.count;
-                    }, 2000);
-                } else {
-                    form.append(`<div class="notice notice-error"><p>Error: ${response.data}</p></div>`);
-                }
-            },
-            error: function () {
-                form.find('.notice').remove();
-                form.append('<div class="notice notice-error"><p>Server connection error</p></div>');
-                form.find('input[type="submit"]').prop('disabled', false);
-            }
-        });
-    });
-
-
-    $('#photo_profile').on('change', function () {
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const preview = $('<img>').attr({
-                    src: e.target.result,
-                    class: 'photo-preview',
-                    style: 'max-width: 200px; margin-top: 10px;'
-                });
-                $('.photo-preview').remove();
-                $('#photo_profile').after(preview);
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+    updateFullName();
 });
