@@ -1,11 +1,11 @@
 <?php
 
-if (!defined('ABSPATH'))
-{
+if (!defined('ABSPATH')) {
     exit;
 }
 
-function judoka_full_name_submit() {
+function judoka_full_name_submit()
+{
     if (isset($_POST['first_name']) && isset($_POST['last_name'])) {
         $first_name = trim(strtoupper($_POST['first_name']));
         $last_name = trim(strtoupper($_POST['last_name']));
@@ -14,7 +14,8 @@ function judoka_full_name_submit() {
 }
 add_action('init', 'judoka_full_name_submit');
 
-function render_judoka_form($judoka = null, $competitions = []) {
+function render_judoka_form($judoka = null, $competitions = [])
+{
     $is_edit = !is_null($judoka);
     $form_id = $is_edit ? 'form-edit-judoka' : 'form-judoka';
     $nonce_action = $is_edit  ? 'edit_judoka' : 'add_judoka_nonce';
@@ -27,18 +28,18 @@ function render_judoka_form($judoka = null, $competitions = []) {
         $first_name = isset($name_parts[0]) ? $name_parts[0] : '';
         $last_name = implode(' ', array_slice($name_parts, 1));
     }
-    ?>
+?>
 
     <div class="wrap">
         <h1><?php echo $is_edit ? 'Edit judoka' : 'Add new judoka'; ?></h1>
 
-        <form method="post" action="" enctype="multipart/form-data" id="<?php echo $form_id;?>" class="judoka-form">
+        <form method="post" action="" enctype="multipart/form-data" id="<?php echo $form_id; ?>" class="judoka-form">
             <?php wp_nonce_field($nonce_action, $nonce_name); ?>
 
-            <?php if($is_edit) : ?>
-                <input type="hidden" name="judoka_id" value="<?php echo $judoka->id;?>">
+            <?php if ($is_edit) : ?>
+                <input type="hidden" name="judoka_id" value="<?php echo $judoka->id; ?>">
                 <input type="hidden" name="old_photo_profile" value="<?php echo esc_attr($judoka->photo_profile); ?>">
-                <input type="hidden" name="old_images" value="<?php echo esc_attr(implode(',', (array)$judoka->images));?>">
+                <input type="hidden" name="old_images" value="<?php echo esc_attr(implode(',', (array)$judoka->images)); ?>">
             <?php endif; ?>
 
             <table class="form-table">
@@ -46,27 +47,27 @@ function render_judoka_form($judoka = null, $competitions = []) {
                     <th><label for="first_name">First Name</label></th>
                     <td>
                         <input type="text" id="first_name" name="first_name" class="regular-text" required
-                               value="<?php echo esc_attr($first_name); ?>">
+                            value="<?php echo esc_attr($first_name); ?>">
                     </td>
                 </tr>
                 <tr>
                     <th><label for="last_name">Last Name</label></th>
                     <td>
                         <input type="text" id="last_name" name="last_name" class="regular-text" required
-                               value="<?php echo esc_attr($last_name); ?>">
+                            value="<?php echo esc_attr($last_name); ?>">
                     </td>
                 </tr>
                 <tr style="display: none;">
                     <td colspan="2">
                         <input type="hidden" id="full_name" name="full_name"
-                               value="<?php echo $is_edit ? esc_attr($judoka->full_name) : ''; ?>">
+                            value="<?php echo $is_edit ? esc_attr($judoka->full_name) : ''; ?>">
                     </td>
                 </tr>
                 <tr>
                     <th><label for="birth_date">Birthdate</label></th>
                     <td>
                         <input type="date" id="birth_date" name="birth_date" required
-                               value="<?php echo $is_edit ? esc_attr($judoka->birth_date) : ''; ?>">
+                            value="<?php echo $is_edit ? esc_attr($judoka->birth_date) : ''; ?>">
                     </td>
                 </tr>
                 <tr>
@@ -82,15 +83,34 @@ function render_judoka_form($judoka = null, $competitions = []) {
                 <tr>
                     <th><label for="weight">Weight</label></th>
                     <td>
-                        <input type="number" step="0.1" id="weight" name="weight" class="regular-text" required
-                               value="<?php echo $is_edit ? esc_attr($judoka->weight) : ''; ?>">
+                        <select id="weight" name="weight" required>
+                            <option value="">Select a weight</option>
+                            <optgroup label="Male">
+                                <?php
+                                $weights_male = ['-60', '-66', '-73', '-81', '-90', '-100', '+100'];
+                                foreach ($weights_male as $weight) {
+                                    $selected = $is_edit && $judoka->weight === $weight ? 'selected' : '';
+                                    echo "<option value=\"{$weight}\" {$selected}>{$weight} kg</option>";
+                                }
+                                ?>
+                            </optgroup>
+                            <optgroup label="Female">
+                                <?php
+                                $weights_female = ['-48', '-52', '-57', '-63', '-70', '-78', '+78'];
+                                foreach ($weights_female as $weight) {
+                                    $selected = $is_edit && $judoka->weight === $weight ? 'selected' : '';
+                                    echo "<option value=\"{$weight}\" {$selected}>{$weight} kg</option>";
+                                }
+                                ?>
+                            </optgroup>
+                        </select>
                     </td>
                 </tr>
                 <tr>
                     <th><label for="club">Club</label></th>
                     <td>
                         <input type="text" id="club" name="club" class="regular-text" required
-                               value="<?php echo $is_edit ? esc_attr($judoka->club) : ''; ?>">
+                            value="<?php echo $is_edit ? esc_attr($judoka->club) : ''; ?>">
                     </td>
                 </tr>
                 <tr>
@@ -100,9 +120,17 @@ function render_judoka_form($judoka = null, $competitions = []) {
                             <option value="">Select a grade</option>
                             <?php
                             $grades = [
-                                'White belt', 'Yellow belt', 'Orange belt', 'Green belt',
-                                'Blue belt', 'Brown belt', 'Black belt 1st dan', 'Black belt 2nd dan',
-                                'Black belt 3rd dan', 'Black belt 4th dan', 'Black belt 5th dan'
+                                'White belt',
+                                'Yellow belt',
+                                'Orange belt',
+                                'Green belt',
+                                'Blue belt',
+                                'Brown belt',
+                                'Black belt 1st dan',
+                                'Black belt 2nd dan',
+                                'Black belt 3rd dan',
+                                'Black belt 4th dan',
+                                'Black belt 5th dan'
                             ];
                             foreach ($grades as $grade) {
                                 $selected = $is_edit && $judoka->grade === $grade ? 'selected' : '';
@@ -166,7 +194,7 @@ function render_judoka_form($judoka = null, $competitions = []) {
                                 <th colspan="2">
                                     <h4>Competition <?php echo $index + 1; ?></h4>
                                     <input type="hidden" name="competitions[<?php echo $index; ?>][id]"
-                                           value="<?php echo $competition->id; ?>">
+                                        value="<?php echo $competition->id; ?>">
                                     <button type="button" class="button remove-competition">Delete this competition</button>
                                 </th>
                             </tr>
@@ -174,28 +202,28 @@ function render_judoka_form($judoka = null, $competitions = []) {
                                 <th><label>Competition Name</label></th>
                                 <td>
                                     <input type="text" name="competitions[<?php echo $index; ?>][competition_name]"
-                                           class="regular-text" value="<?php echo esc_attr($competition->competition_name); ?>">
+                                        class="regular-text" value="<?php echo esc_attr($competition->competition_name); ?>">
                                 </td>
                             </tr>
                             <tr>
                                 <th><label>Competition Date</label></th>
                                 <td>
                                     <input type="date" name="competitions[<?php echo $index; ?>][date_competition]"
-                                           value="<?php echo esc_attr($competition->date_competition); ?>">
+                                        value="<?php echo esc_attr($competition->date_competition); ?>">
                                 </td>
                             </tr>
                             <tr>
                                 <th><label>Points Earned</label></th>
                                 <td>
                                     <input type="number" name="competitions[<?php echo $index; ?>][points]" min="0"
-                                           value="<?php echo esc_attr($competition->points); ?>">
+                                        value="<?php echo esc_attr($competition->points); ?>">
                                 </td>
                             </tr>
                             <tr>
                                 <th><label>Rank</label></th>
                                 <td>
                                     <input type="number" name="competitions[<?php echo $index; ?>][rang]" min="1"
-                                           value="<?php echo esc_attr($competition->rang); ?>">
+                                        value="<?php echo esc_attr($competition->rang); ?>">
                                 </td>
                             </tr>
                             <tr>
@@ -210,7 +238,7 @@ function render_judoka_form($judoka = null, $competitions = []) {
                                 </td>
                             </tr>
                         </table>
-                    <?php endforeach;
+                <?php endforeach;
                 endif; ?>
             </div>
             <button type="button" id="add-competition" class="button">Add another competition</button>
@@ -218,5 +246,5 @@ function render_judoka_form($judoka = null, $competitions = []) {
             <?php submit_button($is_edit ? 'Update changes' : 'Save changes')  ?>
         </form>
     </div>
-    <?php
+<?php
 }

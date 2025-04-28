@@ -55,7 +55,7 @@ class Judoka_Ranking_Shortcode
         ), $atts);
 
         ob_start();
-        ?>
+?>
         <div class="judoka-ranking-container">
             <div class="ranking-sidebar">
                 <?php $this->render_sidebar_filters(); ?>
@@ -70,13 +70,13 @@ class Judoka_Ranking_Shortcode
                 </div>
             </div>
         </div>
-        <?php
+    <?php
         return ob_get_clean();
     }
 
     private function render_sidebar_filters()
     {
-        ?>
+    ?>
         <div class="weight-gender-filters">
             <div class="gender-section">
                 <h3>Gender</h3>
@@ -86,7 +86,7 @@ class Judoka_Ranking_Shortcode
                     <button class="gender-btn" data-gender="F">F</button>
                 </div>
             </div>
-            
+
             <div class="weight-section">
                 <h3>Weight Categories</h3>
                 <div class="weight-buttons">
@@ -95,11 +95,11 @@ class Judoka_Ranking_Shortcode
                         'M' => ['-60', '-66', '-73', '-81', '-90', '-100', '+100'],
                         'F' => ['-48', '-52', '-57', '-63', '-70', '-78', '+78']
                     ];
-                    
+
                     foreach ($weights as $gender => $categories) {
                         echo '<div class="weight-group" data-gender="' . esc_attr($gender) . '">';
                         foreach ($categories as $weight) {
-                            echo '<button class="weight-btn" data-weight="' . esc_attr($weight) . '">' 
+                            echo '<button class="weight-btn" data-weight="' . esc_attr($weight) . '">'
                                 . esc_html($weight) . '</button>';
                         }
                         echo '</div>';
@@ -108,12 +108,12 @@ class Judoka_Ranking_Shortcode
                 </div>
             </div>
         </div>
-        <?php
+    <?php
     }
 
     private function render_top_filters($atts)
     {
-        ?>
+    ?>
         <div class="ranking-filters">
             <select id="category-filter">
                 <option value="all" <?php selected($atts['category'], 'all'); ?>>All Categories</option>
@@ -138,12 +138,12 @@ class Judoka_Ranking_Shortcode
 
             <input type="text" id="search-name" placeholder="Search by name">
         </div>
-        <?php
+    <?php
     }
 
     private function render_table_header()
     {
-        ?>
+    ?>
         <div class="ranking-header">
             <div class="col-place">Place</div>
             <div class="col-change">Ch.</div>
@@ -152,7 +152,7 @@ class Judoka_Ranking_Shortcode
             <div class="col-points">Points</div>
             <div class="col-details expanded-only">Details</div>
         </div>
-        <?php
+    <?php
     }
 
     private function render_table_body($atts)
@@ -176,25 +176,25 @@ class Judoka_Ranking_Shortcode
         $photo_url = !empty($judoka->photo_profile) ? $judoka->photo_profile : $this->default_picture;
         $previous_rank = $this->get_previous_rank($judoka->id);
         $rank_change = $previous_rank ? $previous_rank - $rank : 0;
-        ?>
-        <div class="ranking-row" 
-             data-category="<?php echo esc_attr($judoka->category); ?>"
-             data-gender="<?php echo esc_attr($judoka->gender); ?>"
-             data-weight="<?php echo esc_attr($judoka->weight); ?>"
-             data-club="<?php echo esc_attr($judoka->club); ?>">
-            
+    ?>
+        <div class="ranking-row"
+            data-category="<?php echo esc_attr($judoka->category); ?>"
+            data-gender="<?php echo esc_attr($judoka->gender); ?>"
+            data-weight="<?php echo esc_attr($judoka->weight); ?>"
+            data-club="<?php echo esc_attr($judoka->club); ?>">
+
             <div class="col-place">#<?php echo esc_html($rank); ?></div>
             <div class="col-change"><?php $this->render_rank_change($rank_change); ?></div>
             <div class="col-competitor">
-                <img src="<?php echo esc_url($photo_url); ?>" 
-                     alt="<?php echo esc_attr($judoka->full_name); ?>" 
-                     class="judoka-photo">
+                <img src="<?php echo esc_url($photo_url); ?>"
+                    alt="<?php echo esc_attr($judoka->full_name); ?>"
+                    class="judoka-photo">
                 <span class="judoka-name"><?php echo esc_html($judoka->full_name); ?></span>
             </div>
             <div class="col-nation">
-                <img src="<?php echo esc_url($this->default_flag); ?>" 
-                     alt="Cameroon flag" 
-                     class="nation-flag">
+                <img src="<?php echo esc_url($this->default_flag); ?>"
+                    alt="Cameroon flag"
+                    class="nation-flag">
                 <span><?php echo esc_html($judoka->club); ?></span>
             </div>
             <div class="col-points">
@@ -209,7 +209,7 @@ class Judoka_Ranking_Shortcode
                     if (!empty($competitions)) {
                         echo '<p>Recent competitions:</p><ul>';
                         foreach (array_slice($competitions, 0, 3) as $comp) {
-                            echo '<li>' . esc_html($comp->competition_name) . ' - ' 
+                            echo '<li>' . esc_html($comp->competition_name) . ' - '
                                 . esc_html($comp->points) . ' points</li>';
                         }
                         echo '</ul>';
@@ -218,7 +218,7 @@ class Judoka_Ranking_Shortcode
                 </div>
             </div>
         </div>
-        <?php
+<?php
     }
 
     private function render_rank_change($change)
@@ -325,8 +325,7 @@ class Judoka_Ranking_Shortcode
             $current_date
         ));
 
-        if ($existing_snapshot > 0)
-        {
+        if ($existing_snapshot > 0) {
             return;
         }
 
@@ -363,7 +362,7 @@ class Judoka_Ranking_Shortcode
         );
 
         $judokas = $this->get_ranked_judokas($filters);
-        
+
         ob_start();
         foreach ($judokas as $rank => $judoka) {
             $this->render_judoka_row($judoka, $rank + 1);

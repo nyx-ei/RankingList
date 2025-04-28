@@ -69,7 +69,7 @@ class Judoka_Performance_Shortcode
         $current_page_url = get_permalink();
 
         ob_start();
-        ?>
+?>
         <div class="judoka-list-container">
             <h2>Judoka List</h2>
 
@@ -113,7 +113,7 @@ class Judoka_Performance_Shortcode
                         $total_points = $this->competition_model->get_total_points($judoka->id) ?: 0;
 
                         $profile_url = add_query_arg('judoka_id', $judoka->id, $current_page_url);
-                        ?>
+                ?>
                         <a href="<?php echo esc_url($profile_url); ?>" class="judoka-card-link">
                             <div class="judoka-card"
                                 data-id="<?php echo esc_attr($judoka->id); ?>"
@@ -137,20 +137,20 @@ class Judoka_Performance_Shortcode
                                 </div>
                             </div>
                         </a>
-                        <?php
+                <?php
                     }
                 }
                 ?>
             </div>
         </div>
-        <?php
+    <?php
         return ob_get_clean();
     }
 
     public function render_judoka_details($judoka_id)
     {
         $judoka = $this->judoka_model->get_judoka($judoka_id);
-        
+
         if (!$judoka) {
             return '<p>Judoka not found.</p>';
         }
@@ -176,9 +176,9 @@ class Judoka_Performance_Shortcode
         $age = $birthdate->diff($today)->y;
 
         $photo_url = !empty($judoka->photo_profile) ? $judoka->photo_profile : $this->default_picture;
-        
+
         ob_start();
-        ?>
+    ?>
         <div class="judoka-profile-header" style="background-color: #3a3f78; background-image: linear-gradient(to right, #3a3f78, #2d305e);">
             <div class="profile-info">
                 <div class="profile-photo">
@@ -190,14 +190,14 @@ class Judoka_Performance_Shortcode
                         <img src="<?php echo esc_url($this->default_flag); ?>" alt="Drapeau" class="flag-icon">
                         <span><?php echo esc_html($judoka->club); ?></span>
                     </div>
-                    <p class="age-info">Age: <?php echo esc_html($age); ?> ans</p>
+                    <p class="age-info">Age: <?php echo esc_html((string)$age); ?> ans</p>
                 </div>
                 <div class="weight-display">
-                    -<?php echo esc_html($judoka->weight); ?>
+                    <?php echo esc_html($judoka->weight); ?>
                     <span class="weight-unit">kg</span>
                 </div>
             </div>
-            
+
             <div class="profile-tabs">
                 <a href="#overview" class="tab active">Overview</a>
                 <a href="#photos" class="tab">Photos</a>
@@ -207,13 +207,13 @@ class Judoka_Performance_Shortcode
                 <a href="#wrl" class="tab">WRL</a>
             </div>
         </div>
-        
+
         <div class="profile-content">
             <div id="overview" class="tab-content active">
                 <div class="section-title">
                     <h2>Under the spotlight</h2>
                 </div>
-                
+
                 <div class="spotlight-gallery">
                     <?php
                     $images = !empty($judoka->images) ? json_decode($judoka->images, true) : [];
@@ -222,41 +222,41 @@ class Judoka_Performance_Shortcode
                             echo '<div class="gallery-item"><img src="' . esc_url($image) . '" alt="Photo de ' . esc_attr($judoka->full_name) . '"></div>';
                         }
                     } else {
-                    
+
                         echo '<div class="gallery-item"><img src="' . esc_url($photo_url) . '" alt="Photo de ' . esc_attr($judoka->full_name) . '"></div>';
                     }
                     ?>
                 </div>
-                
+
                 <div class="performance-stats">
                     <div class="stat-container">
                         <div class="stat-box">
                             <div class="stat-value"><?php echo count($competitions); ?></div>
                             <div class="stat-label">Competitions</div>
                         </div>
-                        
+
                         <div class="stat-box">
                             <div class="stat-value"><?php echo $medalStats['Gold']; ?></div>
                             <div class="stat-label">Gold</div>
                         </div>
-                        
+
                         <div class="stat-box">
                             <div class="stat-value"><?php echo $medalStats['Silver']; ?></div>
                             <div class="stat-label">Silver</div>
                         </div>
-                        
+
                         <div class="stat-box">
                             <div class="stat-value"><?php echo $medalStats['Bronze']; ?></div>
                             <div class="stat-label">Bronze</div>
                         </div>
-                        
+
                         <div class="stat-box">
                             <div class="stat-value"><?php echo number_format((float)$totalPoints); ?></div>
                             <div class="stat-label">Points</div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="recent-competitions">
                     <h3>Recent Competitions</h3>
                     <table class="competitions-table">
@@ -276,7 +276,7 @@ class Judoka_Performance_Shortcode
                             } else {
                                 foreach (array_slice($competitions, 0, 5) as $comp) {
                                     $medal_class = strtolower($comp->medals);
-                                    ?>
+                            ?>
                                     <tr>
                                         <td><?php echo esc_html(date('d/m/Y', strtotime($comp->date_competition))); ?></td>
                                         <td><?php echo esc_html($comp->competition_name); ?></td>
@@ -284,7 +284,7 @@ class Judoka_Performance_Shortcode
                                         <td><span class="medal <?php echo esc_attr($medal_class); ?>"><?php echo esc_html($comp->medals); ?></span></td>
                                         <td><?php echo esc_html($comp->points); ?> pts</td>
                                     </tr>
-                                    <?php
+                            <?php
                                 }
                             }
                             ?>
@@ -292,7 +292,7 @@ class Judoka_Performance_Shortcode
                     </table>
                 </div>
             </div>
-            
+
             <div id="contests" class="tab-content">
                 <h2>Competition history</h2>
                 <div class="competitions-filters">
@@ -309,7 +309,7 @@ class Judoka_Performance_Shortcode
                         }
                         ?>
                     </select>
-                    
+
                     <select id="medal-filter">
                         <option value="all">All medals</option>
                         <option value="Gold">Gold</option>
@@ -318,7 +318,7 @@ class Judoka_Performance_Shortcode
                         <option value="none">No medal</option>
                     </select>
                 </div>
-                
+
                 <table class="competitions-table full-width">
                     <thead>
                         <tr>
@@ -337,7 +337,7 @@ class Judoka_Performance_Shortcode
                             foreach ($competitions as $comp) {
                                 $medal_class = strtolower($comp->medals);
                                 $year = date('Y', strtotime($comp->date_competition));
-                                ?>
+                        ?>
                                 <tr data-year="<?php echo esc_attr($year); ?>" data-medal="<?php echo esc_attr($comp->medals); ?>">
                                     <td><?php echo esc_html(date('d/m/Y', strtotime($comp->date_competition))); ?></td>
                                     <td><?php echo esc_html($comp->competition_name); ?></td>
@@ -345,14 +345,14 @@ class Judoka_Performance_Shortcode
                                     <td><span class="medal <?php echo esc_attr($medal_class); ?>"><?php echo esc_html($comp->medals); ?></span></td>
                                     <td><?php echo esc_html($comp->points); ?> pts</td>
                                 </tr>
-                                <?php
+                        <?php
                             }
                         }
                         ?>
                     </tbody>
                 </table>
             </div>
-            
+
             <div id="photos" class="tab-content">
                 <h2>Photos gallery</h2>
                 <div class="photo-gallery">
@@ -368,20 +368,19 @@ class Judoka_Performance_Shortcode
                     ?>
                 </div>
             </div>
-            
+
             <div id="videos" class="tab-content">
                 <h2>Vidéos</h2>
                 <p>No videos available.</p>
             </div>
-            
+
             <div id="results" class="tab-content">
                 <h2>Detailed results</h2>
                 <p>Detailed result data coming soon.</p>
             </div>
         </div>
-        <?php
+<?php
         return ob_get_clean();
-
     }
 
     public function ajax_get_judoka_details()
@@ -389,7 +388,7 @@ class Judoka_Performance_Shortcode
         check_ajax_referer('judoka_performance_nonce', 'nonce');
 
         $judoka_id = isset($_POST['judoka_id']) ? intval($_POST['judoka_id']) : 0;
-        
+
         if ($judoka_id) {
             $html = $this->render_judoka_details($judoka_id);
             wp_send_json_success(['html' => $html]);
