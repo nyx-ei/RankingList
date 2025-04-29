@@ -132,9 +132,54 @@ class Judoka_Model extends Base_Model {
      * @return int|false The ID of the judoka if it exists, false otherwise.
      */
     public function judoka_exists($full_name, $birth_date) {
-        return $this->db->get_var(
+        $result = $this->db->get_var(
             "SELECT id FROM $this->table_name WHERE full_name = %s AND birth_date = %s",
             [$full_name, $birth_date]
         );
+        return $result !== null ? (int) $result : false;
+    }
+
+    /**
+     * Retrieve a paginated list of judokas, optionally filtered by category or club.
+     *
+     * @param int   $page      The page number to retrieve (default 1).
+     * @param int   $per_page  The number of judokas per page (default 10).
+     * @param array $filters   Optional filter criteria.
+     *                         - 'category' (string) The category to filter by.
+     *                         - 'club'      (string) The club to filter by.
+     *
+     * @return array An associative array containing the items and total count.
+     *               - 'items'  (array)  The list of judokas.
+     *               - 'total'  (int)    The total number of judokas matching the filter criteria.
+     */
+    public function get_judokas_paginated($page = 1, $per_page = 10, $filters = []) {
+        $offset = ($page - 1) * $per_page;
+        
+        $where_clauses = [];
+        $query_params = [];
+        
+        if (!empty($filters['category'])) {
+            $where_clauses[] = "category = %s";
+            $query_params[] = $filters['category'];
+        }
+        
+        if (!empty($filters['club'])) {
+            $where_clauses[] = "club = %s";
+            $query_params[] = $filters['club'];
+        }
+        
+        $where_sql = !empty($where_clauses) ? "WHERE " . implode(" AND ", $where_clauses) : "";
+        
+        $count_sql = "SELECT COUNT(*) FROM $this->table_name $where_sql";
+        $total = $this->db->get_var($count_sql, $query_params);
+        
+        $params_for_items = array_merge($query_params, [$per_page, $offset]);
+        $items_sql = "SELECT * FROM $this->table_name $where_sql ORDER BY full_name ASC LIMIT %d OFFSET %d";
+        $items = $this->db->get_results($items_sql, $params_for_items);
+        
+        return [
+            'items' => $items,
+            'total' => $total
+        ];
     }
 }

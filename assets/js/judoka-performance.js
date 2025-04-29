@@ -2,16 +2,22 @@ jQuery(document).ready(function($) {
     $('.gender-btn').on('click', function() {
         $('.gender-btn').removeClass('active');
         $(this).addClass('active');
-        
-        filterJudokas();
+
+        if (!$('#apply-filters').length) {
+            filterJudokas();
+        }
     });
     
     $('#category-filter, #club-filter').on('change', function() {
-        filterJudokas();
+        if (!$('#apply-filters').length) {
+            filterJudokas();
+        }
     });
     
     $('#search-judoka').on('input', function() {
-        filterJudokas();
+        if (!$('#apply-filters').length) {
+            filterJudokas();
+        }
     });
     
     function filterJudokas() {
@@ -67,7 +73,7 @@ jQuery(document).ready(function($) {
             $(target).addClass('active');
         });
     }
-    
+
     function setupCompetitionFilters() {
         $('#competition-year-filter, #medal-filter').on('change', function() {
             filterCompetitions();
@@ -113,6 +119,56 @@ jQuery(document).ready(function($) {
             $('.expanded-only').show();
         } else {
             $('.expanded-only').hide();
+        }
+    });
+
+    $('#apply-filters').on('click', function() {
+        applyFilters();
+    });
+    
+    function applyFilters() {
+        const category = $('#category-filter').val();
+        const club = $('#club-filter').val();
+        const gender = $('.gender-btn.active').data('gender');
+        const search = $('#search-judoka').val();
+
+        let url = window.location.href.split('?')[0];
+        let params = [];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('judoka_id')) {
+            params.push('judoka_id=' + urlParams.get('judoka_id'));
+        }
+
+        if (category && category !== 'all') {
+            params.push('category=' + encodeURIComponent(category));
+        }
+        
+        if (club && club !== 'all') {
+            params.push('club=' + encodeURIComponent(club));
+        }
+        
+        if (gender && gender !== 'all') {
+            params.push('gender=' + encodeURIComponent(gender));
+        }
+        
+        if (search) {
+            params.push('search=' + encodeURIComponent(search));
+        }
+        
+        params.push('judo_page=1');
+
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+        
+        window.location.href = url;
+    }
+    
+    $('#search-judoka').on('keypress', function(e) {
+        if (e.which === 13 && $('#apply-filters').length) {
+            e.preventDefault();
+            applyFilters();
         }
     });
 });

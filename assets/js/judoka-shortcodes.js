@@ -61,8 +61,22 @@ jQuery(document).ready(function($) {
                     $(this).hide();
                 }
             });
+            
+            checkNoResults();
         }, 300);
     });
+    
+    function checkNoResults() {
+        const visibleRows = $('.ranking-row:visible').length;
+        
+        if (visibleRows === 0) {
+            if ($('.no-visible-results').length === 0) {
+                $('.ranking-body').append('<div class="no-visible-results">No judokas found matching your search criteria.</div>');
+            }
+        } else {
+            $('.no-visible-results').remove();
+        }
+    }
 
     function updateRankingTable() {
         $.ajax({
@@ -79,13 +93,20 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success) {
                     $('.ranking-body').html(response.data.html);
+                    
                     const searchTerm = $('#search-name').val().toLowerCase();
                     if (searchTerm) {
                         $('.ranking-row').each(function() {
                             const name = $(this).find('.judoka-name').text().toLowerCase();
                             $(this).toggle(name.includes(searchTerm));
                         });
+                        
+                        checkNoResults();
                     }
+                    
+                    $('.ranking-table').attr('data-view', currentFilters.view);
+                    
+                    $('.ranking-pagination').hide();
                 }
             },
             complete: function() {
@@ -93,6 +114,19 @@ jQuery(document).ready(function($) {
             }
         });
     }
+    
+    $(document).on('click', '.pagination-link:not(.disabled)', function(e) {
+        // Permettre la navigation par défaut (sans AJAX) pour maintenir l'état
+        // La pagination est gérée côté serveur
+    });
 
     $('.ranking-table').attr('data-view', 'simple');
+    
+    if ($('.gender-btn.active').data('gender') !== 'all' || 
+        $('.weight-btn.active').length > 0 || 
+        $('#category-filter').val() !== 'all' || 
+        $('#club-filter').val() !== 'all' || 
+        $('#search-name').val().length > 0) {
+        $('.ranking-pagination').hide();
+    }
 });

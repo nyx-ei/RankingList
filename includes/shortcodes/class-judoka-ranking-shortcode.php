@@ -51,11 +51,14 @@ class Judoka_Ranking_Shortcode
             'category' => 'all',
             'gender' => 'all',
             'weight' => 'all',
-            'club' => 'all'
+            'club' => 'all',
+            'per_page' => 10,
         ), $atts);
 
+        $current_page = isset($_GET['rank_page']) ? max(1, intval($_GET['rank_page'])) : 1;
+
         ob_start();
-        ?>
+?>
         <div class="judoka-ranking-container">
             <div class="ranking-sidebar">
                 <?php $this->render_sidebar_filters(); ?>
@@ -65,18 +68,18 @@ class Judoka_Ranking_Shortcode
                 <div class="ranking-table" data-view="simple">
                     <?php
                     $this->render_table_header();
-                    $this->render_table_body($atts);
+                    $this->render_table_body($atts, $current_page, intval($atts['per_page']));
                     ?>
                 </div>
             </div>
         </div>
-        <?php
+    <?php
         return ob_get_clean();
     }
 
     private function render_sidebar_filters()
     {
-        ?>
+    ?>
         <div class="weight-gender-filters">
             <div class="gender-section">
                 <h3>Gender</h3>
@@ -86,7 +89,7 @@ class Judoka_Ranking_Shortcode
                     <button class="gender-btn" data-gender="F">F</button>
                 </div>
             </div>
-            
+
             <div class="weight-section">
                 <h3>Weight Categories</h3>
                 <div class="weight-buttons">
@@ -95,11 +98,11 @@ class Judoka_Ranking_Shortcode
                         'M' => ['-60', '-66', '-73', '-81', '-90', '-100', '+100'],
                         'F' => ['-48', '-52', '-57', '-63', '-70', '-78', '+78']
                     ];
-                    
+
                     foreach ($weights as $gender => $categories) {
                         echo '<div class="weight-group" data-gender="' . esc_attr($gender) . '">';
                         foreach ($categories as $weight) {
-                            echo '<button class="weight-btn" data-weight="' . esc_attr($weight) . '">' 
+                            echo '<button class="weight-btn" data-weight="' . esc_attr($weight) . '">'
                                 . esc_html($weight) . '</button>';
                         }
                         echo '</div>';
@@ -108,12 +111,12 @@ class Judoka_Ranking_Shortcode
                 </div>
             </div>
         </div>
-        <?php
+    <?php
     }
 
     private function render_top_filters($atts)
     {
-        ?>
+    ?>
         <div class="ranking-filters">
             <select id="category-filter">
                 <option value="all" <?php selected($atts['category'], 'all'); ?>>All Categories</option>
@@ -138,12 +141,12 @@ class Judoka_Ranking_Shortcode
 
             <input type="text" id="search-name" placeholder="Search by name">
         </div>
-        <?php
+    <?php
     }
 
     private function render_table_header()
     {
-        ?>
+    ?>
         <div class="ranking-header">
             <div class="col-place">Place</div>
             <div class="col-change">Ch.</div>
@@ -152,23 +155,104 @@ class Judoka_Ranking_Shortcode
             <div class="col-points">Points</div>
             <div class="col-details expanded-only">Details</div>
         </div>
-        <?php
+    <?php
     }
 
-    private function render_table_body($atts)
+    private function render_table_body($atts, $current_page = 1, $per_page = 10)
     {
-        $judokas = $this->get_ranked_judokas($atts);
+        $all_judokas = $this->get_ranked_judokas($atts);
+        $total_judokas = count($all_judokas);
+        $total_pages = ceil($total_judokas / $per_page);
 
-        if (empty($judokas)) {
+        $start_index = ($current_page - 1) * $per_page;
+
+        $judokas_for_page = array_slice($all_judokas, $start_index, $per_page);
+
+        if (empty($all_judokas)) {
             echo '<div class="no-results">No judokas found matching the criteria.</div>';
             return;
         }
 
         echo '<div class="ranking-body">';
-        foreach ($judokas as $rank => $judoka) {
-            $this->render_judoka_row($judoka, $rank + 1);
+        foreach ($judokas_for_page as $index => $judoka) {
+            $rank = $start_index + $index + 1; // Le rang global
+            $this->render_judoka_row($judoka, $rank);
         }
         echo '</div>';
+
+        $this->render_pagination($total_pages, $current_page, $atts);
+    }
+
+    private function render_pagination($total_pages, $current_page, $atts)
+    {
+        if ($total_pages <= 1) {
+            return;
+        }
+
+        $current_url = get_permalink();
+
+        $params = [];
+        if ($atts['category'] !== 'all') {
+            $params['category'] = $atts['category'];
+        }
+        if ($atts['gender'] !== 'all') {
+            $params['gender'] = $atts['gender'];
+        }
+        if ($atts['weight'] !== 'all') {
+            $params['weight'] = $atts['weight'];
+        }
+        if ($atts['club'] !== 'all') {
+            $params['club'] = $atts['club'];
+        }
+
+        $disable_first = $current_page == 1 ? 'disabled' : '';
+        $disable_prev = $current_page == 1 ? 'disabled' : '';
+        $disable_next = $current_page == $total_pages ? 'disabled' : '';
+        $disable_last = $current_page == $total_pages ? 'disabled' : '';
+        
+        $params['rank_page'] = 1;
+        $first_page_url = add_query_arg($params, $current_url);
+
+        $params['rank_page'] = max(1, $current_page - 1);
+        $prev_page_url = add_query_arg($params, $current_url);
+
+        $params['rank_page'] = min($total_pages, $current_page + 1);
+        $next_page_url = add_query_arg($params, $current_url);
+
+        $params['rank_page'] = $total_pages;
+        $last_page_url = add_query_arg($params, $current_url);
+    ?>
+        <div class="ranking-pagination">
+            <div class="pagination-container">
+                <a class="pagination-link <?php echo $disable_first; ?>" href="<?php echo esc_url($first_page_url); ?>">
+                    <span class="screen-reader-text">First page</span>
+                    <span aria-hidden="true">«</span>
+                </a>
+                <a class="pagination-link <?php echo $disable_prev; ?>" href="<?php echo esc_url($prev_page_url); ?>">
+                    <span class="screen-reader-text">Previous page</span>
+                    <span aria-hidden="true">‹</span>
+                </a>
+
+                <span class="pagination-current">
+                    <?php echo $current_page; ?> of <?php echo $total_pages; ?>
+                </span>
+
+                <a class="pagination-link <?php echo $disable_next; ?>" href="<?php echo esc_url($next_page_url); ?>">
+                    <span class="screen-reader-text">Next page</span>
+                    <span aria-hidden="true">›</span>
+                </a>
+                <a class="pagination-link <?php echo $disable_last; ?>" href="<?php echo esc_url($last_page_url); ?>">
+                    <span class="screen-reader-text">Last page</span>
+                    <span aria-hidden="true">»</span>
+                </a>
+            </div>
+            <div class="pagination-info">
+                <span class="total-items">
+                    <?php echo $total_pages > 0 ? "Displaying " . min($total_pages, $current_page) . " of $total_pages pages" : "No results"; ?>
+                </span>
+            </div>
+        </div>
+    <?php
     }
 
     private function render_judoka_row($judoka, $rank)
@@ -176,25 +260,25 @@ class Judoka_Ranking_Shortcode
         $photo_url = !empty($judoka->photo_profile) ? $judoka->photo_profile : $this->default_picture;
         $previous_rank = $this->get_previous_rank($judoka->id);
         $rank_change = $previous_rank ? $previous_rank - $rank : 0;
-        ?>
-        <div class="ranking-row" 
-             data-category="<?php echo esc_attr($judoka->category); ?>"
-             data-gender="<?php echo esc_attr($judoka->gender); ?>"
-             data-weight="<?php echo esc_attr($judoka->weight); ?>"
-             data-club="<?php echo esc_attr($judoka->club); ?>">
-            
+    ?>
+        <div class="ranking-row"
+            data-category="<?php echo esc_attr($judoka->category); ?>"
+            data-gender="<?php echo esc_attr($judoka->gender); ?>"
+            data-weight="<?php echo esc_attr($judoka->weight); ?>"
+            data-club="<?php echo esc_attr($judoka->club); ?>">
+
             <div class="col-place">#<?php echo esc_html($rank); ?></div>
             <div class="col-change"><?php $this->render_rank_change($rank_change); ?></div>
             <div class="col-competitor">
-                <img src="<?php echo esc_url($photo_url); ?>" 
-                     alt="<?php echo esc_attr($judoka->full_name); ?>" 
-                     class="judoka-photo">
+                <img src="<?php echo esc_url($photo_url); ?>"
+                    alt="<?php echo esc_attr($judoka->full_name); ?>"
+                    class="judoka-photo">
                 <span class="judoka-name"><?php echo esc_html($judoka->full_name); ?></span>
             </div>
             <div class="col-nation">
-                <img src="<?php echo esc_url($this->default_flag); ?>" 
-                     alt="Cameroon flag" 
-                     class="nation-flag">
+                <img src="<?php echo esc_url($this->default_flag); ?>"
+                    alt="Cameroon flag"
+                    class="nation-flag">
                 <span><?php echo esc_html($judoka->club); ?></span>
             </div>
             <div class="col-points">
@@ -209,7 +293,7 @@ class Judoka_Ranking_Shortcode
                     if (!empty($competitions)) {
                         echo '<p>Recent competitions:</p><ul>';
                         foreach (array_slice($competitions, 0, 3) as $comp) {
-                            echo '<li>' . esc_html($comp->competition_name) . ' - ' 
+                            echo '<li>' . esc_html($comp->competition_name) . ' - '
                                 . esc_html($comp->points) . ' points</li>';
                         }
                         echo '</ul>';
@@ -218,7 +302,7 @@ class Judoka_Ranking_Shortcode
                 </div>
             </div>
         </div>
-        <?php
+<?php
     }
 
     private function render_rank_change($change)
@@ -325,8 +409,7 @@ class Judoka_Ranking_Shortcode
             $current_date
         ));
 
-        if ($existing_snapshot > 0)
-        {
+        if ($existing_snapshot > 0) {
             return;
         }
 
@@ -363,7 +446,7 @@ class Judoka_Ranking_Shortcode
         );
 
         $judokas = $this->get_ranked_judokas($filters);
-        
+
         ob_start();
         foreach ($judokas as $rank => $judoka) {
             $this->render_judoka_row($judoka, $rank + 1);

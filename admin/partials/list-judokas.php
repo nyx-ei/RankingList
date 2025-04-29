@@ -6,7 +6,23 @@ if (!defined('ABSPATH')) {
 
 $judoka_model = new Judoka_Model();
 $competition_model = new Competition_Model();
-$judokas = $judoka_model->get_judokas();
+
+$per_page = 10; 
+$current_page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
+
+$filters = [];
+if (!empty($_GET['category'])) {
+    $filters['category'] = sanitize_text_field($_GET['category']);
+}
+if (!empty($_GET['club'])) {
+    $filters['club'] = sanitize_text_field($_GET['club']);
+}
+
+$result = $judoka_model->get_judokas_paginated($current_page, $per_page, $filters);
+$judokas = $result['items'];
+$total_judokas = $result['total'];
+$total_pages = ceil($total_judokas / $per_page);
+
 ?>
 
 <div class="wrap">
@@ -27,9 +43,11 @@ $judokas = $judoka_model->get_judokas();
                 <?php
                 $categories = $judoka_model->get_distinct_categories();
                 foreach ($categories as $category) {
+                    $selected = isset($_GET['category']) && $_GET['category'] === $category ? ' selected' : '';
                     echo sprintf(
-                        '<option value="%s">%s</option>',
+                        '<option value="%s"%s>%s</option>',
                         esc_attr($category),
+                        $selected,
                         esc_html($category)
                     );
                 }
@@ -40,15 +58,79 @@ $judokas = $judoka_model->get_judokas();
                 <?php
                 $clubs = $judoka_model->get_distinct_clubs();
                 foreach ($clubs as $club) {
+                    $selected = isset($_GET['club']) && $_GET['club'] === $club ? ' selected' : '';
                     echo sprintf(
-                        '<option value="%s">%s</option>',
+                        '<option value="%s"%s>%s</option>',
                         esc_attr($club),
+                        $selected,
                         esc_html($club)
                     );
                 }
                 ?>
             </select>
             <button class="button" id="filter-submit">Filtrer</button>
+            <?php if (!empty($filters)): ?>
+                <a href="?page=list-judokas" class="button clear-filters">Effacer les filtres</a>
+            <?php endif; ?>
+        </div>
+
+        <div class="tablenav-pages">
+            <span class="displaying-num"><?php echo $total_judokas; ?> items</span>
+            <?php if ($total_pages > 1): ?>
+                <span class="pagination-links">
+                    <?php
+                    $disable_first = $current_page == 1 ? 'disabled' : '';
+                    $disable_prev = $current_page == 1 ? 'disabled' : '';
+                    $disable_next = $current_page == $total_pages ? 'disabled' : '';
+                    $disable_last = $current_page == $total_pages ? 'disabled' : '';
+
+                    // Préserver les filtres dans les liens de pagination
+                    $pagination_args = ['paged' => 1];
+                    if (!empty($filters['category'])) {
+                        $pagination_args['category'] = $filters['category'];
+                    }
+                    if (!empty($filters['club'])) {
+                        $pagination_args['club'] = $filters['club'];
+                    }
+
+                    $first_page_url = add_query_arg($pagination_args);
+
+                    $pagination_args['paged'] = max(1, $current_page - 1);
+                    $prev_page_url = add_query_arg($pagination_args);
+
+                    $pagination_args['paged'] = min($total_pages, $current_page + 1);
+                    $next_page_url = add_query_arg($pagination_args);
+
+                    $pagination_args['paged'] = $total_pages;
+                    $last_page_url = add_query_arg($pagination_args);
+                    ?>
+
+                    <a class="first-page button <?php echo $disable_first; ?>" href="<?php echo esc_url($first_page_url); ?>">
+                        <span class="screen-reader-text">First page</span>
+                        <span aria-hidden="true">«</span>
+                    </a>
+                    <a class="prev-page button <?php echo $disable_prev; ?>" href="<?php echo esc_url($prev_page_url); ?>">
+                        <span class="screen-reader-text">Previous page</span>
+                        <span aria-hidden="true">‹</span>
+                    </a>
+
+                    <span class="paging-input">
+                        <span class="current-page"><?php echo $current_page; ?></span>
+                        <span class="tablenav-paging-text"> of
+                            <span class="total-pages"><?php echo $total_pages; ?></span>
+                        </span>
+                    </span>
+
+                    <a class="next-page button <?php echo $disable_next; ?>" href="<?php echo esc_url($next_page_url); ?>">
+                        <span class="screen-reader-text">Next page</span>
+                        <span aria-hidden="true">›</span>
+                    </a>
+                    <a class="last-page button <?php echo $disable_last; ?>" href="<?php echo esc_url($last_page_url); ?>">
+                        <span class="screen-reader-text">Last page</span>
+                        <span aria-hidden="true">»</span>
+                    </a>
+                </span>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -76,8 +158,8 @@ $judokas = $judoka_model->get_judokas();
                     <td>
                         <?php if (!empty($judoka->photo_profile)): ?>
                             <img src="<?php echo esc_url($judoka->photo_profile); ?>"
-                                 alt="Photo de <?php echo esc_attr($judoka->full_name); ?>"
-                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                alt="Photo de <?php echo esc_attr($judoka->full_name); ?>"
+                                style="width: 50px; height: 50px; object-fit: cover;">
                         <?php endif; ?>
                     </td>
                     <td><?php echo esc_html($judoka->full_name); ?></td>
@@ -95,10 +177,10 @@ $judokas = $judoka_model->get_judokas();
                     </td>
                     <td>
                         <a href="?page=edit-judoka&id=<?php echo $judoka->id; ?>"
-                           class="button button-small">Edit</a>
+                            class="button button-small">Edit</a>
                         <button class="button button-small delete-judoka"
-                                data-id="<?php echo $judoka->id; ?>"
-                                data-name="<?php echo esc_attr($judoka->full_name); ?>">
+                            data-id="<?php echo $judoka->id; ?>"
+                            data-name="<?php echo esc_attr($judoka->full_name); ?>">
                             Delete
                         </button>
                     </td>
@@ -106,21 +188,99 @@ $judokas = $judoka_model->get_judokas();
             <?php endforeach; ?>
         </tbody>
     </table>
+
+    <div class="tablenav bottom">
+        <div class="tablenav-pages">
+            <span class="displaying-num"><?php echo $total_judokas; ?> items</span>
+            <?php if ($total_pages > 1): ?>
+                <span class="pagination-links">
+                    <?php
+                    $disable_first = $current_page == 1 ? 'disabled' : '';
+                    $disable_prev = $current_page == 1 ? 'disabled' : '';
+                    $disable_next = $current_page == $total_pages ? 'disabled' : '';
+                    $disable_last = $current_page == $total_pages ? 'disabled' : '';
+
+                    $pagination_args = ['paged' => 1];
+                    if (!empty($filters['category'])) {
+                        $pagination_args['category'] = $filters['category'];
+                    }
+                    if (!empty($filters['club'])) {
+                        $pagination_args['club'] = $filters['club'];
+                    }
+
+                    $first_page_url = add_query_arg($pagination_args);
+
+                    $pagination_args['paged'] = max(1, $current_page - 1);
+                    $prev_page_url = add_query_arg($pagination_args);
+
+                    $pagination_args['paged'] = min($total_pages, $current_page + 1);
+                    $next_page_url = add_query_arg($pagination_args);
+
+                    $pagination_args['paged'] = $total_pages;
+                    $last_page_url = add_query_arg($pagination_args);
+                    ?>
+
+                    <a class="first-page button <?php echo $disable_first; ?>" href="<?php echo esc_url($first_page_url); ?>">
+                        <span class="screen-reader-text">First page</span>
+                        <span aria-hidden="true">«</span>
+                    </a>
+                    <a class="prev-page button <?php echo $disable_prev; ?>" href="<?php echo esc_url($prev_page_url); ?>">
+                        <span class="screen-reader-text">Previous page</span>
+                        <span aria-hidden="true">‹</span>
+                    </a>
+
+                    <span class="paging-input">
+                        <span class="current-page"><?php echo $current_page; ?></span>
+                        <span class="tablenav-paging-text"> of
+                            <span class="total-pages"><?php echo $total_pages; ?></span>
+                        </span>
+                    </span>
+
+                    <a class="next-page button <?php echo $disable_next; ?>" href="<?php echo esc_url($next_page_url); ?>">
+                        <span class="screen-reader-text">Next page</span>
+                        <span aria-hidden="true">›</span>
+                    </a>
+                    <a class="last-page button <?php echo $disable_last; ?>" href="<?php echo esc_url($last_page_url); ?>">
+                        <span class="screen-reader-text">Last page</span>
+                        <span aria-hidden="true">»</span>
+                    </a>
+                </span>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
 <script>
-jQuery(document).ready(function($) {
-    $('#filter-submit').on('click', function() {
-        const category = $('#filter-category').val();
-        const club = $('#filter-club').val();
+    jQuery(document).ready(function($) {
+        $('#filter-submit').on('click', function() {
+            const category = $('#filter-category').val();
+            const club = $('#filter-club').val();
+            
+            let url = window.location.href;
 
-        $('table tbody tr').each(function() {
-            const $row = $(this);
-            const showCategory = !category || $row.find('td:eq(3)').text() === category;
-            const showClub = !club || $row.find('td:eq(4)').text() === club;
+            let baseUrl = '';
+            const match = url.match(/([^\?]*\?page=list-judokas)/);
+            if (match) {
+                baseUrl = match[1];
+            } else {
+                baseUrl = '?page=list-judokas';
+            }
 
-            $row.toggle(showCategory && showClub);
+            let newUrl = baseUrl;
+
+            if (category) {
+                newUrl += '&category=' + encodeURIComponent(category);
+            }
+            if (club) {
+                newUrl += '&club=' + encodeURIComponent(club);
+            }
+
+            window.location.href = newUrl;
+        });
+
+        $('.clear-filters').on('click', function(e) {
+            e.preventDefault();
+            window.location.href = '?page=list-judokas';
         });
     });
-});
 </script>

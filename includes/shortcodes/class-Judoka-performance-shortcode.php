@@ -49,22 +49,40 @@ class Judoka_Performance_Shortcode
     {
         $atts = shortcode_atts(array(
             'judoka_id' => 0,
+            'per_page' => 8,
         ), $atts);
 
         $atts = array_map('sanitize_text_field', $atts);
 
         $judoka_id = intval($atts['judoka_id']);
+        $per_page = intval($atts['per_page']);
 
         if ($judoka_id === 0) {
-            return $this->render_judokas_list();
+            return $this->render_judokas_list($per_page);
         }
 
         return $this->render_judoka_details($judoka_id);
     }
 
-    private function render_judokas_list()
+    private function render_judokas_list($per_page = 12)
     {
-        $judokas = $this->judoka_model->get_judokas();
+        $current_page = isset($_GET['judo_page']) ? max(1, intval($_GET['judo_page'])) : 1;
+        
+        $filters = [];
+        if (!empty($_GET['category']) && $_GET['category'] !== 'all') {
+            $filters['category'] = sanitize_text_field($_GET['category']);
+        }
+        if (!empty($_GET['club']) && $_GET['club'] !== 'all') {
+            $filters['club'] = sanitize_text_field($_GET['club']);
+        }
+        if (!empty($_GET['gender']) && $_GET['gender'] !== 'all') {
+            $filters['gender'] = sanitize_text_field($_GET['gender']);
+        }
+        
+        $result = $this->judoka_model->get_judokas_paginated($current_page, $per_page, $filters);
+        $judokas = $result['items'];
+        $total_judokas = $result['total'];
+        $total_pages = ceil($total_judokas / $per_page);
 
         $current_page_url = get_permalink();
 
@@ -79,7 +97,8 @@ class Judoka_Performance_Shortcode
                     <?php
                     $categories = $this->judoka_model->get_distinct_categories();
                     foreach ($categories as $category) {
-                        echo '<option value="' . esc_attr($category) . '">' . esc_html($category) . '</option>';
+                        $selected = (isset($_GET['category']) && $_GET['category'] === $category) ? ' selected' : '';
+                        echo '<option value="' . esc_attr($category) . '"' . $selected . '>' . esc_html($category) . '</option>';
                     }
                     ?>
                 </select>
@@ -89,18 +108,23 @@ class Judoka_Performance_Shortcode
                     <?php
                     $clubs = $this->judoka_model->get_distinct_clubs();
                     foreach ($clubs as $club) {
-                        echo '<option value="' . esc_attr($club) . '">' . esc_html($club) . '</option>';
+                        $selected = (isset($_GET['club']) && $_GET['club'] === $club) ? ' selected' : '';
+                        echo '<option value="' . esc_attr($club) . '"' . $selected . '>' . esc_html($club) . '</option>';
                     }
                     ?>
                 </select>
 
                 <div class="gender-filter">
-                    <button class="gender-btn active" data-gender="all">All</button>
-                    <button class="gender-btn" data-gender="M">Men</button>
-                    <button class="gender-btn" data-gender="F">Women</button>
+                    <button class="gender-btn <?php echo (!isset($_GET['gender']) || $_GET['gender'] === 'all') ? 'active' : ''; ?>" data-gender="all">All</button>
+                    <button class="gender-btn <?php echo (isset($_GET['gender']) && $_GET['gender'] === 'M') ? 'active' : ''; ?>" data-gender="M">Men</button>
+                    <button class="gender-btn <?php echo (isset($_GET['gender']) && $_GET['gender'] === 'F') ? 'active' : ''; ?>" data-gender="F">Women</button>
                 </div>
 
                 <input type="text" id="search-judoka" placeholder="Search a judoka">
+                <button id="apply-filters" class="filter-button">Apply Filters</button>
+                <?php if (!empty($filters)): ?>
+                    <a href="<?php echo esc_url($current_page_url); ?>" class="clear-filters-button">Clear Filters</a>
+                <?php endif; ?>
             </div>
 
             <div class="judoka-grid">
@@ -142,7 +166,121 @@ class Judoka_Performance_Shortcode
                 }
                 ?>
             </div>
+            
+            <?php if ($total_pages > 1): ?>
+            <div class="judoka-pagination">
+                <div class="pagination-container">
+                    <?php
+                    $disable_first = $current_page == 1 ? 'disabled' : '';
+                    $disable_prev = $current_page == 1 ? 'disabled' : '';
+                    $disable_next = $current_page == $total_pages ? 'disabled' : '';
+                    $disable_last = $current_page == $total_pages ? 'disabled' : '';
+
+                    $pagination_args = ['judo_page' => 1];
+                    if (!empty($filters['category'])) {
+                        $pagination_args['category'] = $filters['category'];
+                    }
+                    if (!empty($filters['club'])) {
+                        $pagination_args['club'] = $filters['club'];
+                    }
+                    if (!empty($filters['gender'])) {
+                        $pagination_args['gender'] = $filters['gender'];
+                    }
+                    
+                    $first_page_url = add_query_arg($pagination_args, $current_page_url);
+                    
+                    $pagination_args['judo_page'] = max(1, $current_page - 1);
+                    $prev_page_url = add_query_arg($pagination_args, $current_page_url);
+                    
+                    $pagination_args['judo_page'] = min($total_pages, $current_page + 1);
+                    $next_page_url = add_query_arg($pagination_args, $current_page_url);
+                    
+                    $pagination_args['judo_page'] = $total_pages;
+                    $last_page_url = add_query_arg($pagination_args, $current_page_url);
+                    ?>
+                    
+                    <a class="pagination-link <?php echo $disable_first; ?>" href="<?php echo esc_url($first_page_url); ?>">
+                        <span class="screen-reader-text">First page</span>
+                        <span aria-hidden="true">«</span>
+                    </a>
+                    <a class="pagination-link <?php echo $disable_prev; ?>" href="<?php echo esc_url($prev_page_url); ?>">
+                        <span class="screen-reader-text">Previous page</span>
+                        <span aria-hidden="true">‹</span>
+                    </a>
+                    
+                    <span class="pagination-current">
+                        <?php echo $current_page; ?> of <?php echo $total_pages; ?>
+                    </span>
+                    
+                    <a class="pagination-link <?php echo $disable_next; ?>" href="<?php echo esc_url($next_page_url); ?>">
+                        <span class="screen-reader-text">Next page</span>
+                        <span aria-hidden="true">›</span>
+                    </a>
+                    <a class="pagination-link <?php echo $disable_last; ?>" href="<?php echo esc_url($last_page_url); ?>">
+                        <span class="screen-reader-text">Last page</span>
+                        <span aria-hidden="true">»</span>
+                    </a>
+                </div>
+                <div class="pagination-info">
+                    <span class="total-items">
+                        <?php echo $total_judokas; ?> judokas found
+                    </span>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
+        
+        <script>
+        jQuery(document).ready(function($) {
+            $('#apply-filters').on('click', function() {
+                applyFilters();
+            });
+
+            function applyFilters() {
+                const category = $('#category-filter').val();
+                const club = $('#club-filter').val();
+                const gender = $('.gender-btn.active').data('gender');
+                const search = $('#search-judoka').val();
+
+                let url = '<?php echo esc_js($current_page_url); ?>';
+                let params = [];
+                
+                if (category && category !== 'all') {
+                    params.push('category=' + encodeURIComponent(category));
+                }
+                
+                if (club && club !== 'all') {
+                    params.push('club=' + encodeURIComponent(club));
+                }
+                
+                if (gender && gender !== 'all') {
+                    params.push('gender=' + encodeURIComponent(gender));
+                }
+                
+                if (search) {
+                    params.push('search=' + encodeURIComponent(search));
+                }
+                
+                if (params.length > 0) {
+                    url += (url.indexOf('?') !== -1 ? '&' : '?') + params.join('&');
+                }
+
+                window.location.href = url;
+            }
+            
+            $('.gender-btn').on('click', function() {
+                $('.gender-btn').removeClass('active');
+                $(this).addClass('active');
+            });
+            
+            $('#search-judoka').on('keypress', function(e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    applyFilters();
+                }
+            });
+        });
+        </script>
         <?php
         return ob_get_clean();
     }
@@ -161,13 +299,13 @@ class Judoka_Performance_Shortcode
 
         $medalStats = array(
             'Gold' => 0,
-            'Sliver' => 0,
+            'Silver' => 0,
             'Bronze' => 0
         );
 
         foreach ($medalsCount as $medal) {
             if (isset($medalStats[$medal->medals])) {
-                $medalStats[$medal->medals]++;
+                $medalStats[$medal->medals] = $medal->count;
             }
         }
 
@@ -381,7 +519,6 @@ class Judoka_Performance_Shortcode
         </div>
         <?php
         return ob_get_clean();
-
     }
 
     public function ajax_get_judoka_details()

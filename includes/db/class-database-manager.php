@@ -1,21 +1,24 @@
 <?php
 
-class Database_Manager {
-    
+class Database_Manager
+{
+
     private $wpdb;
     private $charset_collate;
 
-    public function __construct() {
+    public function __construct()
+    {
         global $wpdb;
         $this->wpdb = $wpdb;
         $this->charset_collate = $wpdb->get_charset_collate();
     }
 
-    public function createJudokasTable() {
+    public function createJudokasTable()
+    {
 
         try {
-             $table_name = $this->wpdb->prefix . 'judokas';
-             $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            $table_name = $this->wpdb->prefix . 'judokas';
+            $sql = "CREATE TABLE IF NOT EXISTS $table_name (
              id mediumint(9) NOT NULL AUTO_INCREMENT,
              full_name varchar(100) NOT NULL,
              birth_date date NOT NULL,
@@ -30,16 +33,15 @@ class Database_Manager {
              updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
              PRIMARY KEY  (id)
             ) $this->charset_collate;";
-            
+
             return $this->executeQuery($sql);
         } catch (\Throwable $e) {
             return new WP_Error('database_error', $e->getMessage());
         }
-
-       
     }
 
-    public function createCompetitionsTable() {
+    public function createCompetitionsTable()
+    {
         try {
             $table_name = $this->wpdb->prefix . 'competitions_judoka';
             $judokas_table = $this->wpdb->prefix . 'judokas';
@@ -56,7 +58,7 @@ class Database_Manager {
             PRIMARY KEY  (id),
             FOREIGN KEY (judoka_id) REFERENCES $judokas_table(id)
             ) $this->charset_collate;";
-        
+
             return $this->executeQuery($sql);
         } catch (\Throwable $e) {
             return new WP_Error('database_error', $e->getMessage());
@@ -66,8 +68,8 @@ class Database_Manager {
     public function createRankingsHistoryTable()
     {
         try {
-        $table_name = $this->wpdb->prefix . 'rankings_history';
-        $judokas_table = $this->wpdb->prefix . 'judokas';
+            $table_name = $this->wpdb->prefix . 'rankings_history';
+            $judokas_table = $this->wpdb->prefix . 'judokas';
 
             $sql = "CREATE TABLE IF NOT EXISTS $table_name (
                 id mediumint(9) NOT NULL AUTO_INCREMENT,
@@ -88,7 +90,8 @@ class Database_Manager {
     }
 
 
-    private function executeQuery($sql) {
+    private function executeQuery($sql)
+    {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
     }

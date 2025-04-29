@@ -142,10 +142,20 @@
     height: 60px;
 }
 
+.judoka-name {
+    font-size: 12px;
+    font-weight: 500;
+}
+
 .col-nation {
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 13px; 
+}
+
+.col-points {
+    font-size: 10px;
 }
 
 .nation-flag {
@@ -179,7 +189,7 @@
     padding: 10px;
     background: #f8f9fa;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 12px; 
 }
 
 .details-content ul {
@@ -191,6 +201,60 @@
 .ranking-body.loading {
     opacity: 0.5;
     pointer-events: none;
+}
+
+/* Styles pour la pagination */
+.ranking-pagination {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border-top: 1px solid #e5e5e5;
+    padding-top: 20px;
+}
+
+.pagination-container {
+    display: flex;
+    align-items: center;
+}
+
+.pagination-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 30px;
+    height: 30px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background-color: #f7f7f7;
+    color: #555;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.pagination-link:hover {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.pagination-link.disabled {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+}
+
+.pagination-current {
+    margin: 0 10px;
+    font-weight: 500;
+    color: #444;
+}
+
+.pagination-info {
+    color: #666;
+    font-size: 0.9em;
 }
 
 /* Responsive Design */
@@ -225,5 +289,19 @@
     .col-points,
     .col-details {
         display: none;
+    }
+    
+    .ranking-pagination {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .pagination-container {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pagination-info {
+        text-align: center;
     }
 }
